@@ -14,7 +14,8 @@ sidebar <- dashboardSidebar(
   ),
   sidebarMenu(menuItem(text = "Traffic"),
               menuSubItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
-              menuSubItem(text = "Breakdown", tabName = "action_breakdown")
+              menuSubItem(text = "Breakdown", tabName = "action_breakdown"),
+              menuSubItem(text = "Dwell time", tabName = "dwell_data")
   )
 )
 
@@ -27,7 +28,10 @@ body <- dashboardBody(
     tabItem(tabName = "action_breakdown",
             dygraphOutput("action_breakdown_dygraph"),
             includeMarkdown("./tab_documentation/breakdown.md")
-            
+    ),
+    tabItem(tabName = "dwell_data",
+            dygraphOutput("dwelltime_dygraph"),
+            includeMarkdown("./tab_documentation/dwelltime.md")
     )
   )
 )

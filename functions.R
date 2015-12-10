@@ -16,3 +16,7 @@ read_clickthrough <- function(){
   
   return(invisible())
 }
+
+read_dwelltime <- function(){
+  dwelltime_data <<- as.data.table(polloi::read_dataset(path = "portal/dwell_metrics.tsv"))
+}
