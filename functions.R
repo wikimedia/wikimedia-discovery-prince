@@ -1,6 +1,7 @@
 library(polloi)
 library(data.table)
 library(reshape2)
+library(magrittr)
 
 # Read in the traffic data
 read_clickthrough <- function(){

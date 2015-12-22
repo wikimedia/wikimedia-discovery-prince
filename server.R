@@ -14,18 +14,27 @@ shinyServer(function(input, output){
   output$clickthrough_rate_dygraph <- renderDygraph({
     polloi::make_dygraph(
       data = clickthrough_rate,
-      xlab = "Date", ylab = "Clickthrough rate (%)", title = "Wikipedia portal clickthrough rate")
+      xlab = "Date", ylab = "Clickthrough rate (%)", title = "Wikipedia portal clickthrough rate") %>%
+      dyAnnotation(as.Date("2015-12-07"), text = "A",
+                   tooltip = "Sampling change - see below",
+                   width = 12, height = 20, attachAtBottom = FALSE)
   })
   
   output$action_breakdown_dygraph <- renderDygraph({
     polloi::make_dygraph(
       data = action_breakdown,
-      xlab = "Date", ylab = "Actions (%)", title = "Actions on the Wikipedia portal")
+      xlab = "Date", ylab = "Actions (%)", title = "Actions on the Wikipedia portal") %>%
+      dyAnnotation(as.Date("2015-12-07"), text = "A",
+                   tooltip = "Sampling change - see below",
+                   width = 12, height = 20, attachAtBottom = FALSE)
   })
   
   output$dwelltime_dygraph <- renderDygraph({
     polloi::make_dygraph(
       data = dwelltime_data,
-      xlab = "Date", ylab = "Dwell Time (Seconds)", title = "Time spent on the Wikipedia portal")
+      xlab = "Date", ylab = "Dwell Time (Seconds)", title = "Time spent on the Wikipedia portal") %>%
+      dyAnnotation(as.Date("2015-12-07"), text = "A",
+                   tooltip = "Sampling change - see below",
+                   width = 12, height = 20, attachAtBottom = FALSE)
   })
 })
