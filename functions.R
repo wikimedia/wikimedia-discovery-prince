@@ -21,3 +21,11 @@ read_clickthrough <- function(){
 read_dwelltime <- function(){
   dwelltime_data <<- as.data.table(polloi::read_dataset(path = "portal/dwell_metrics.tsv"))
 }
+
+read_country <- function(){
+  data <- as.data.table(polloi::read_dataset(path = "portal/country_data.tsv"))
+  
+  country_data <<- reshape2::dcast(data[,list(country = country, events = round(events/sum(events)*100,2)),
+                                        by = "date"],
+                                   formula = date ~ country, fun.aggregate = sum)
+}

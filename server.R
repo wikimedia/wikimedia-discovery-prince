@@ -5,9 +5,10 @@ existing_date <- Sys.Date() - 1
 
 shinyServer(function(input, output){
   
-  if (Sys.Date() != existing_date) {
+  if(Sys.Date() != existing_date) {
     read_clickthrough()
     read_dwelltime()
+    read_country()
     existing_date <<- Sys.Date()
   }
   
@@ -36,5 +37,14 @@ shinyServer(function(input, output){
       dyAnnotation(as.Date("2015-12-07"), text = "A",
                    tooltip = "Sampling change - see below",
                    width = 12, height = 20, attachAtBottom = FALSE)
+  })
+  
+  output$country_breakdown_dygraph <- renderDygraph({
+    polloi::make_dygraph(
+      data = country_data,
+      xlab = "Date",
+      ylab = "Users (%)",
+      title = "Geographic breakdown of portal visitors"
+    )
   })
 })
