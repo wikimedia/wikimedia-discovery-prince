@@ -1,0 +1,8 @@
+#country_breakdown .dygraph-legend, #country_breakdown .dygraph-label {
+  background-color: #222D32 !important;
+  color: #ECF0F5;
+}
+
+#country_breakdown_dygraph .dygraph-axis-label {
+  color: #ECF0F5;
+}

@@ -1,4 +1,4 @@
-Dwell-time on the Wikipedia portal
+Where users come from to the Wikipedia portal
 =======
 
 This measures where portal users come from each day, displaying the proportion of users from each top-10 country and the proportion from other countries, as a percentage.

@@ -27,7 +27,9 @@ body <- dashboardBody(
             includeMarkdown("./tab_documentation/clickthrough_rate.md")
     ),
     tabItem(tabName = "action_breakdown",
-            dygraphOutput("action_breakdown_dygraph"),
+            div(dygraphOutput("action_breakdown_dygraph"),
+                div(id = "action_breakdown_legend",
+                    style = "height: 60px; padding-top: 30px; padding-left: 20px;")),
             includeMarkdown("./tab_documentation/breakdown.md")
     ),
     tabItem(tabName = "dwell_data",
@@ -35,7 +37,10 @@ body <- dashboardBody(
             includeMarkdown("./tab_documentation/dwelltime.md")
     ),
     tabItem(tabName = "country_breakdown",
-            dygraphOutput("country_breakdown_dygraph"),
+            div(dygraphOutput("country_breakdown_dygraph"),
+                div(id = "country_breakdown_legend",
+                    style = "height: 60px; padding-top: 30px; padding-left: 20px;"),
+                style = "width: 100%; background-color: #222D32; color: #ECF0F5; padding-top: 10px;"),
             includeMarkdown("./tab_documentation/geography.md")
     )
   )
