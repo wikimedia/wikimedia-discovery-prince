@@ -33,7 +33,7 @@ a {
   border-left-color: black !important;
 }
 
-.content, .tab-content {
+.content, .tab-content, .content-wrapper {
   color: #ECF0F5 !important;
   background-color: #222D32 !important;
 }
