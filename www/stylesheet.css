@@ -1,3 +1,49 @@
 .kpi_date {
 	margin-top: 0px;
 }
+
+a {
+  color: DeepSkyBlue;
+}
+
+.sidebar-toggle::before {
+  color: white;
+}
+
+.sidebar-toggle:hover::before {
+  color: black;
+}
+
+.main-sidebar {
+  color: black;
+  background-color: rgb(184, 199, 206) !important;
+}
+
+.sidebar-menu > li > a {
+  color: #1e282c !important;
+}
+
+.sidebar-menu > li > a:hover {
+  background-color: #ECF0F5 !important;
+  border-left-color: black !important;
+}
+
+.sidebar-menu > li.active > a {
+  background-color: #ECF0F5 !important;
+  border-left-color: black !important;
+}
+
+.content, .tab-content {
+  color: #ECF0F5 !important;
+  background-color: #222D32 !important;
+}
+
+.main-header, .navbar, .navbar-static-top, .logo {
+  color: white !important;
+  background-color: black !important;
+  border-color: black !important;
+}
+
+.sidebar-toggle {
+  border-color: black !important;
+}
