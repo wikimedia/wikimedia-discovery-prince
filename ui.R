@@ -12,11 +12,11 @@ sidebar <- dashboardSidebar(
     tags$link(rel = "stylesheet", type = "text/css", href = "stylesheet.css"),
     tags$script(src = "custom.js")
   ),
-  sidebarMenu(menuItem(text = "Traffic"),
-              menuSubItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
-              menuSubItem(text = "Breakdown", tabName = "action_breakdown"),
-              menuSubItem(text = "Dwell time", tabName = "dwell_data"),
-              menuSubItem(text = "Geographic breakdown", tabName = "country_breakdown")
+  sidebarMenu(menuItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
+              menuItem(text = "Breakdown", tabName = "action_breakdown"),
+              menuItem(text = "Dwell time", tabName = "dwell_data"),
+              menuItem(text = "Geographic breakdown", tabName = "country_breakdown"),
+              menuItem(text = "Browser breakdown", tabName = "browser_breakdown", badgeColor = "light-blue", badgeLabel = "New!")
   )
 )
 
@@ -42,6 +42,24 @@ body <- dashboardBody(
                     style = "height: 60px; padding-top: 30px; padding-left: 20px;"),
                 style = "width: 100%; background-color: #222D32; color: #ECF0F5; padding-top: 10px;"),
             includeMarkdown("./tab_documentation/geography.md")
+    ),
+    tabItem(tabName = "browser_breakdown",
+            fluidRow(column(selectInput("browser_order", "Sort", selected = "growth",
+                                        choices = list("Alphabetically" = "alphabet",
+                                                       "By popularity growth rate" = "growth",
+                                                       "By popularity decay rate" = "decay",
+                                                       "Last recorded percentage" = "last",
+                                                       "Number of times it appears in data" = "times")),
+                            textInput("browser_filter", "Filter", placeholder = "IE, firefox"),
+                            helpText("Case insensitive & accepts comma-separated input."),
+                            uiOutput("browser_selector_container"),
+                            width = 3),
+                     column(div(dygraphOutput("browser_breakdown_dygraph"),
+                                div(id = "browser_breakdown_legend",
+                                    style = "height: 60px; padding-top: 30px; padding-left: 20px;"),
+                                style = "width: 100%; background-color: #222D32; color: #ECF0F5; padding-top: 10px;"),
+                            width = 9)),
+            includeMarkdown("./tab_documentation/browsers.md")
     )
   )
 )
