@@ -9,6 +9,7 @@ shinyServer(function(input, output){
     read_clickthrough()
     read_dwelltime()
     read_country()
+		read_useragents()
     existing_date <<- Sys.Date()
   }
   
