@@ -30,6 +30,22 @@ read_country <- function(){
                                    formula = date ~ country, fun.aggregate = sum)
 }
 
+read_useragents <- function(){
+  data <- as.data.table(polloi::read_dataset(path = "portal/user_agent_data.tsv"))
+  data$browser <- paste(data$browser, data$version)
+  data$version <- NULL
+  data <- data[order(data$date, data$browser),,]
+  ua_data <<- data
+  browser_rates <<- data[, list(rate = get_exp_rate(date, percent),
+                                last = tail(percent, 1),
+                                times = length(percent)),
+                         by = "browser"]
+}
+
+read_pageviews <- function(){
+  pageview_data <<- polloi::read_dataset(path = "portal/portal_pageviews.tsv")
+}
+
 # Fits an exponential model to the data and returns the rate of growth (or decay!)
 get_exp_rate <- function(dates, y) {
   time_frame <- range(dates)
@@ -45,16 +61,4 @@ get_exp_rate <- function(dates, y) {
   }
   # plot(x, y, type = "l")
   # lines(x, predict(fit, list(x = x)), lty = "dashed", col = "blue")
-}
-
-read_useragents <- function(){
-  data <- as.data.table(polloi::read_dataset(path = "portal/user_agent_data.tsv"))
-  data$browser <- paste(data$browser, data$version)
-  data$version <- NULL
-  data <- data[order(data$date, data$browser),,]
-  ua_data <<- data
-  browser_rates <<- data[, list(rate = get_exp_rate(date, percent),
-                                last = tail(percent, 1),
-                                times = length(percent)),
-                           by = "browser"]
 }

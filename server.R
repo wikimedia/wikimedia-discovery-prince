@@ -10,6 +10,7 @@ shinyServer(function(input, output){
     read_dwelltime()
     read_country()
 		read_useragents()
+		read_pageviews()
     existing_date <<- Sys.Date()
   }
   
@@ -97,5 +98,12 @@ shinyServer(function(input, output){
       polloi::make_dygraph(xlab = "Date", ylab = "Share (%)", title = "Browser breakdown of portal visitors") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyLegend(labelsDiv = "browser_breakdown_legend", show = "always", width = 400)
+  })
+  
+  output$pageview_dygraph <- renderDygraph({
+    pageview_data %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "Pageviews", title = "Pageviews to the Wikipedia Portal") %>%
+      dyCSS(css = "www/inverse.css") %>%
+      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70)
   })
 })

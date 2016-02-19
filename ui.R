@@ -13,10 +13,11 @@ sidebar <- dashboardSidebar(
     tags$script(src = "custom.js")
   ),
   sidebarMenu(menuItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
-              menuItem(text = "Breakdown", tabName = "action_breakdown"),
+              menuItem(text = "Action breakdown", tabName = "action_breakdown"),
               menuItem(text = "Dwell time", tabName = "dwell_data"),
               menuItem(text = "Geographic breakdown", tabName = "country_breakdown"),
-              menuItem(text = "Browser breakdown", tabName = "browser_breakdown", badgeColor = "light-blue", badgeLabel = "New!")
+              menuItem(text = "Browser breakdown", tabName = "browser_breakdown", badgeColor = "light-blue", badgeLabel = "New!"),
+              menuItem(text = "Pageviews", tabName = "pageview_tab", badgeColor = "light-blue", badgeLabel = "New!")
   )
 )
 
@@ -60,6 +61,10 @@ body <- dashboardBody(
                                 style = "width: 100%; background-color: #222D32; color: #ECF0F5; padding-top: 10px;"),
                             width = 9)),
             includeMarkdown("./tab_documentation/browsers.md")
+    ),
+    tabItem(tabName = "pageview_tab",
+            dygraphOutput("pageview_dygraph"),
+            includeMarkdown("./tab_documentation/pageviews.md")
     )
   )
 )
