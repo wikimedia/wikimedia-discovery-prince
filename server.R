@@ -3,7 +3,7 @@ options(scipen = 500)
 
 existing_date <- Sys.Date() - 1
 
-shinyServer(function(input, output){
+shinyServer(function(input, output, session){
   
   if(Sys.Date() != existing_date) {
     read_clickthrough()
@@ -14,8 +14,11 @@ shinyServer(function(input, output){
     existing_date <<- Sys.Date()
   }
   
+  shinyURL.server(session)
+  
   output$clickthrough_rate_dygraph <- renderDygraph({
     clickthrough_rate %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_clickthrough_rate)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Clickthrough rate (%)", title = "Wikipedia portal clickthrough rate") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
@@ -25,9 +28,9 @@ shinyServer(function(input, output){
   })
   
   output$action_breakdown_dygraph <- renderDygraph({
-    polloi::make_dygraph(
-      data = action_breakdown,
-      xlab = "Date", ylab = "Actions (%)", title = "Actions on the Wikipedia portal") %>%
+    action_breakdown %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_action_breakdown)) %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "Actions (%)", title = "Actions on the Wikipedia portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyLegend(labelsDiv = "action_breakdown_legend", show = "always", width = 400) %>%
@@ -37,9 +40,9 @@ shinyServer(function(input, output){
   })
   
   output$dwelltime_dygraph <- renderDygraph({
-    polloi::make_dygraph(
-      data = dwelltime_data,
-      xlab = "Date", ylab = "Dwell Time (Seconds)", title = "Time spent on the Wikipedia portal") %>%
+    dwelltime_data %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_dwelltime)) %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "Dwell Time (Seconds)", title = "Time spent on the Wikipedia portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAnnotation(as.Date("2015-12-07"), text = "A",
@@ -49,6 +52,7 @@ shinyServer(function(input, output){
   
   output$country_breakdown_dygraph <- renderDygraph({
     country_data %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_country_breakdown)) %>%
       polloi::make_dygraph(xlab = "", ylab = "Users (%)", title = "Geographic breakdown of portal visitors") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
@@ -95,6 +99,7 @@ shinyServer(function(input, output){
   output$browser_breakdown_dygraph <- renderDygraph({
     ua_data[ua_data$browser %in% input$browser_selector, , ] %>%
       reshape2::dcast(date ~ browser, fun.aggregate = sum) %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_browser_breakdown)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Share (%)", title = "Browser breakdown of portal visitors") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyLegend(labelsDiv = "browser_breakdown_legend", show = "always", width = 400)
@@ -102,6 +107,7 @@ shinyServer(function(input, output){
   
   output$pageview_dygraph <- renderDygraph({
     pageview_data %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_pageviews)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Pageviews", title = "Pageviews to the Wikipedia Portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70)

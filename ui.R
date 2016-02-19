@@ -1,8 +1,8 @@
 library(shiny)
 library(shinydashboard)
 library(dygraphs)
+library(shinyURL)
 options(scipen = 500)
-source("functions.R")
 
 #Header elements for the visualisation
 header <- dashboardHeader(title = "Wikipedia Portal Traffic", disable = FALSE)
@@ -12,32 +12,45 @@ sidebar <- dashboardSidebar(
     tags$link(rel = "stylesheet", type = "text/css", href = "stylesheet.css"),
     tags$script(src = "custom.js")
   ),
-  sidebarMenu(menuItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
-              menuItem(text = "Action breakdown", tabName = "action_breakdown"),
-              menuItem(text = "Dwell time", tabName = "dwell_data"),
-              menuItem(text = "Geographic breakdown", tabName = "country_breakdown"),
-              menuItem(text = "Browser breakdown", tabName = "browser_breakdown", badgeColor = "light-blue", badgeLabel = "New!"),
-              menuItem(text = "Pageviews", tabName = "pageview_tab", badgeColor = "light-blue", badgeLabel = "New!")
+  sidebarMenu(menuItem("Traffic",
+                       menuSubItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
+                       menuSubItem(text = "Action breakdown", tabName = "action_breakdown"),
+                       menuSubItem(text = "Dwell time", tabName = "dwell_data"),
+                       menuSubItem(text = "Geographic breakdown", tabName = "country_breakdown"),
+                       menuSubItem(text = "Browser breakdown", tabName = "browser_breakdown"),
+                       menuSubItem(text = "Pageviews", tabName = "pageview_tab"),
+                       icon = icon("line-chart")),
+              menuItem(text = "Global Settings",
+                       selectInput(inputId = "smoothing_global", label = "Smoothing", selectize = TRUE, selected = "day",
+                                   choices = c("No Smoothing" = "day", "Weekly Median" = "week", "Monthly Median" = "month")),
+                       br(style = "line-height:25%;"), icon = icon("cog", lib = "glyphicon")),
+              menuItem(text = "Sharing Options", shinyURL.ui(tinyURL = FALSE),
+                       p("Dashboard settings stored in URL.", style = "padding-bottom: 10px;"),
+                       icon = icon("share-alt", lib = "glyphicon"))
   )
 )
 
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "clickthrough_rate",
+            polloi::smooth_select("smoothing_clickthrough_rate"),
             dygraphOutput("clickthrough_rate_dygraph"),
             includeMarkdown("./tab_documentation/clickthrough_rate.md")
     ),
     tabItem(tabName = "action_breakdown",
+            polloi::smooth_select("smoothing_action_breakdown"),
             div(dygraphOutput("action_breakdown_dygraph"),
                 div(id = "action_breakdown_legend",
                     style = "height: 60px; padding-top: 30px; padding-left: 20px;")),
             includeMarkdown("./tab_documentation/breakdown.md")
     ),
     tabItem(tabName = "dwell_data",
+            polloi::smooth_select("smoothing_dwelltime"),
             dygraphOutput("dwelltime_dygraph"),
             includeMarkdown("./tab_documentation/dwelltime.md")
     ),
     tabItem(tabName = "country_breakdown",
+            polloi::smooth_select("smoothing_country_breakdown"),
             div(dygraphOutput("country_breakdown_dygraph"),
                 div(id = "country_breakdown_legend",
                     style = "height: 60px; padding-top: 30px; padding-left: 20px;"),
@@ -55,7 +68,8 @@ body <- dashboardBody(
                             helpText("Case insensitive & accepts comma-separated input."),
                             uiOutput("browser_selector_container"),
                             width = 3),
-                     column(div(dygraphOutput("browser_breakdown_dygraph"),
+                     column(div(polloi::smooth_select("smoothing_browser_breakdown"),
+                                dygraphOutput("browser_breakdown_dygraph"),
                                 div(id = "browser_breakdown_legend",
                                     style = "height: 60px; padding-top: 30px; padding-left: 20px;"),
                                 style = "width: 100%; background-color: #222D32; color: #ECF0F5; padding-top: 10px;"),
@@ -63,6 +77,7 @@ body <- dashboardBody(
             includeMarkdown("./tab_documentation/browsers.md")
     ),
     tabItem(tabName = "pageview_tab",
+            polloi::smooth_select("smoothing_pageviews"),
             dygraphOutput("pageview_dygraph"),
             includeMarkdown("./tab_documentation/pageviews.md")
     )
