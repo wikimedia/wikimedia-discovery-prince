@@ -32,14 +32,18 @@ read_country <- function(){
 
 read_useragents <- function(){
   data <- as.data.table(polloi::read_dataset(path = "portal/user_agent_data.tsv"))
-  data$browser <- paste(data$browser, data$version)
-  data$version <- NULL
-  data <- data[order(data$date, data$browser),,]
+  data$version <- paste(data$browser, data$version)
+  data <- data[order(data$date, data$version),,]
   ua_data <<- data
-  browser_rates <<- data[, list(rate = get_exp_rate(date, percent),
+  interim <- data[, list(percent = sum(percent)), by = c("date", "browser")]
+  browser_rates <<- interim[, list(rate = get_exp_rate(date, percent),
+                                   last = tail(percent, 1),
+                                   times = length(percent)),
+                              by = "browser"]
+  version_rates <<- data[, list(rate = get_exp_rate(date, percent),
                                 last = tail(percent, 1),
                                 times = length(percent)),
-                         by = "browser"]
+                         by = "version"]
 }
 
 read_pageviews <- function(){

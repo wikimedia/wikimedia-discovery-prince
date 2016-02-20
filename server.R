@@ -62,19 +62,39 @@ shinyServer(function(input, output, session){
   output$browser_selector_container <- renderUI({
     browsers <- switch(input$browser_order,
                        "alphabet" = {
-                         sort(browser_rates$browser)
+                         if (input$group_browsers) {
+                           sort(browser_rates$browser, na.last = TRUE)
+                         } else {
+                           sort(version_rates$version, na.last = TRUE)
+                         }
                        },
                        "growth" = {
-                         browser_rates$browser[order(browser_rates$rate, decreasing = TRUE)]
+                         if (input$group_browsers) {
+                           browser_rates$browser[order(browser_rates$rate, decreasing = TRUE, na.last = TRUE)]
+                         } else {
+                           version_rates$version[order(version_rates$rate, decreasing = TRUE, na.last = TRUE)]
+                         }
                        },
                        "decay" = {
-                         browser_rates$browser[order(browser_rates$rate, decreasing = FALSE)]
+                         if (input$group_browsers) {
+                           browser_rates$browser[order(browser_rates$rate, decreasing = FALSE, na.last = TRUE)]
+                         } else {
+                           version_rates$version[order(version_rates$rate, decreasing = FALSE, na.last = TRUE)]
+                         }
                        },
                        "last" = {
-                         browser_rates$browser[order(browser_rates$last, decreasing = TRUE)]
+                         if (input$group_browsers) {
+                           browser_rates$browser[order(browser_rates$last, decreasing = TRUE, na.last = TRUE)]
+                         } else {
+                           version_rates$version[order(version_rates$last, decreasing = TRUE, na.last = TRUE)]
+                         }
                        },
                        "times" = {
-                         browser_rates$browser[order(browser_rates$times, decreasing = TRUE)]
+                         if (input$group_browsers) {
+                           browser_rates$browser[order(browser_rates$times, decreasing = TRUE, na.last = TRUE)]
+                         } else {
+                           version_rates$version[order(version_rates$times, decreasing = TRUE, na.last = TRUE)]
+                         }
                        })
     if (input$browser_filter != "") {
       if (grepl(",\\s?", input$browser_filter, fixed = FALSE)) {
@@ -97,8 +117,14 @@ shinyServer(function(input, output, session){
   })
   
   output$browser_breakdown_dygraph <- renderDygraph({
-    ua_data[ua_data$browser %in% input$browser_selector, , ] %>%
-      reshape2::dcast(date ~ browser, fun.aggregate = sum) %>%
+    if (input$group_browsers) {
+      temp <- ua_data[ua_data$browser %in% input$browser_selector, , ] %>%
+        reshape2::dcast(date ~ browser, fun.aggregate = sum)
+    } else {
+      temp <- ua_data[ua_data$version %in% input$browser_selector, , ] %>%
+        reshape2::dcast(date ~ version, fun.aggregate = sum)
+    }
+    temp %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_browser_breakdown)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Share (%)", title = "Browser breakdown of portal visitors") %>%
       dyCSS(css = "www/inverse.css") %>%

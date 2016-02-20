@@ -66,6 +66,7 @@ body <- dashboardBody(
                                                        "Number of times it appears in data" = "times")),
                             textInput("browser_filter", "Filter", placeholder = "IE, firefox"),
                             helpText("Case insensitive & accepts comma-separated input."),
+                            checkboxInput("group_browsers", "Group browser versions", FALSE),
                             uiOutput("browser_selector_container"),
                             width = 3),
                      column(div(polloi::smooth_select("smoothing_browser_breakdown"),
