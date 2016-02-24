@@ -32,6 +32,9 @@ read_country <- function(){
 
 read_useragents <- function(){
   data <- as.data.table(polloi::read_dataset(path = "portal/user_agent_data.tsv"))
+  data$browser[data$browser == "Chrome Mobile"] <- "Chrome Mobile (Android)"
+  data$browser[data$browser == "Chrome Mobile iOS"] <- "Chrome Mobile (iOS)"
+  data$browser[data$browser == "Mobile Safari"] <- "Safari Mobile"
   data$version <- paste(data$browser, data$version)
   data <- data[order(data$date, data$version),,]
   ua_data <<- data
