@@ -11,6 +11,7 @@ shinyServer(function(input, output, session){
     read_country()
 		read_useragents()
 		read_pageviews()
+		read_referrals()
     existing_date <<- Sys.Date()
   }
   
@@ -138,4 +139,27 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70)
   })
+  
+  output$referer_summary_dygraph <- renderDygraph({
+    summary_traffic_data %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_referer_summary)) %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "% of Pageviews",
+                           title = "Traffic to Wikipedia Portal brown down by origin") %>%
+      dyCSS(css = "www/inverse.css") %>%
+      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
+      dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
+      dyLegend(labelsDiv = "referer_summary_legend", show = "always", width = 400)
+  })
+  
+  output$search_engines_dygraph <- renderDygraph({
+    bysearch_traffic_data %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_search_engines)) %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "% of Pageviews",
+                           title = "Traffic to Wikipedia Portal broken down by search engine") %>%
+      dyCSS(css = "www/inverse.css") %>%
+      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
+      dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
+      dyLegend(labelsDiv = "search_engines_legend", show = "always", width = 400)
+  })
+  
 })

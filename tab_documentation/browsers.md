@@ -20,7 +20,7 @@ For technical, non-bug questions, [email Mikhail](mailto:mpopov@wikimedia.org?su
 <hr style="border-color: gray;">
 <p style="font-size: small; color: gray;">
   <strong>Link to this dashboard:</strong>
-  <a href="http://discovery.wmflabs.org/portal/#geographic">
-    http://discovery.wmflabs.org/portal/#geographic
+  <a href="http://discovery.wmflabs.org/portal/#browser_breakdown">
+    http://discovery.wmflabs.org/portal/#browser_breakdown
   </a>
 </p>

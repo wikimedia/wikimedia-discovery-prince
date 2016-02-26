@@ -21,7 +21,7 @@ For technical, non-bug questions, [email Mikhail](mailto:mpopov@wikimedia.org?su
 <hr style="border-color: gray;">
 <p style="font-size: small; color: gray;">
   <strong>Link to this dashboard:</strong>
-  <a href="http://discovery.wmflabs.org/portal/#dwelltime">
-    http://discovery.wmflabs.org/portal/#dwelltime
+  <a href="http://discovery.wmflabs.org/portal/#dwell_data">
+    http://discovery.wmflabs.org/portal/#dwell_data
   </a>
 </p>

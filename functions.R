@@ -53,6 +53,35 @@ read_pageviews <- function(){
   pageview_data <<- polloi::read_dataset(path = "portal/portal_pageviews.tsv")
 }
 
+read_referrals <- function(){
+  
+  # Read in the initial data
+  data <- as.data.table(polloi::read_dataset(path = "portal/portal_referer_data.tsv"))
+  
+  # Format
+  data$is_search <- ifelse(data$is_search, "Referred by search", "Not referred by search")
+  data$search_engine[data$search_engine %in% c("none","None")] <- "Not referred by search"
+  
+  # Write out the overall values for traffic
+  interim <- data[, j = list(pageviews = sum(pageviews)),
+                    by = c("date", "is_search")] %>%
+    reshape2::dcast(formula = date ~ is_search, fun.aggregate = sum)
+  interim$Total <- interim$`Not referred by search` + interim$`Referred by search`
+  interim$`Not referred by search` <- round(100*interim$`Not referred by search`/interim$Total, 2)
+  interim$`Referred by search` <- round(100*interim$`Referred by search`/interim$Total, 2)
+  summary_traffic_data <<- interim[, 1:3]
+  
+  # Generate per-engine values
+  interim <- data[data$search_engine != "Not referred by search",
+                  j = list(pageviews = sum(pageviews)),
+                  by = c("date", "search_engine")] %>%
+    reshape2::dcast(formula = date ~ search_engine, fun.aggregate = sum)
+  bysearch_traffic_data <<- cbind(date = interim$date, data.frame(round(100*t(apply(interim[, -1], 1, function(x) { x/sum(x) })), 2)))
+  
+  return(invisible())
+  
+}
+
 # Fits an exponential model to the data and returns the rate of growth (or decay!)
 get_exp_rate <- function(dates, y) {
   time_frame <- range(dates)

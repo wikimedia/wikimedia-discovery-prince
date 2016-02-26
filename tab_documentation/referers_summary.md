@@ -1,16 +1,16 @@
-Pageviews to the portal
+Traffic to Wikipedia Portal from external search engines
 =======
 
-This looks at, without sampling, the number of pageviews the Wikipedia Portal gets per day. This is expressed
-as raw values.
+This dashboard simply looks at, very broadly, where our pageviews are coming from.
 
 General trends
 ------
 
+On average (or "average" because we use medians), traffic from search engines accounts for 1.42% of overall traffic to the Portal.
+
 Outages and inaccuracies
 ------
-
-* None so far!
+None so far!
 
 Questions, bug reports, and feature suggestions
 ------
@@ -19,7 +19,7 @@ For technical, non-bug questions, [email Mikhail](mailto:mpopov@wikimedia.org?su
 <hr style="border-color: gray;">
 <p style="font-size: small; color: gray;">
   <strong>Link to this dashboard:</strong>
-  <a href="http://discovery.wmflabs.org/portal/#pageview_tab">
-    http://discovery.wmflabs.org/portal/#pageview_tab
+  <a href="http://discovery.wmflabs.org/portal/#referrals_summary">
+    http://discovery.wmflabs.org/portal/#referrals_summary
   </a>
 </p>

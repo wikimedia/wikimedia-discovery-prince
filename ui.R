@@ -20,6 +20,10 @@ sidebar <- dashboardSidebar(
                        menuSubItem(text = "Browser breakdown", tabName = "browser_breakdown"),
                        menuSubItem(text = "Pageviews", tabName = "pageview_tab"),
                        icon = icon("line-chart")),
+              menuItem("External Referrals",
+                       menuSubItem(text = "Overall Referral Traffic", tabName = "referrals_summary"),
+                       menuSubItem(text = "Breakdown by Search Engine", tabName = "search_engines"),
+                       icon = icon("external-link")),
               menuItem(text = "Global Settings",
                        selectInput(inputId = "smoothing_global", label = "Smoothing", selectize = TRUE, selected = "day",
                                    choices = c("No Smoothing" = "day", "Weekly Median" = "week", "Monthly Median" = "month")),
@@ -81,6 +85,18 @@ body <- dashboardBody(
             polloi::smooth_select("smoothing_pageviews"),
             dygraphOutput("pageview_dygraph"),
             includeMarkdown("./tab_documentation/pageviews.md")
+    ),
+    tabItem(tabName = "referrals_summary",
+            fluidRow(column(polloi::smooth_select("smoothing_referer_summary"), width = 3),
+                     column(div(id= "referer_summary_legend"), width = 8)),
+            dygraphOutput("referer_summary_dygraph"),
+            includeMarkdown("./tab_documentation/referers_summary.md")
+    ),
+    tabItem(tabName = "search_engines",
+            fluidRow(column(polloi::smooth_select("smoothing_search_engines"), width = 3),
+                     column(div(id= "search_engines_legend"), width = 8)),
+            dygraphOutput("search_engines_dygraph"),
+            includeMarkdown("./tab_documentation/referers_byengine.md")
     )
   )
 )
