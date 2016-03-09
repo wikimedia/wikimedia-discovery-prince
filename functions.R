@@ -62,14 +62,21 @@ read_referrals <- function(){
   data$is_search <- ifelse(data$is_search, "Referred by search", "Not referred by search")
   data$search_engine[data$search_engine %in% c("none","None")] <- "Not referred by search"
   
+  
   # Write out the overall values for traffic
   interim <- data[, j = list(pageviews = sum(pageviews)),
-                    by = c("date", "is_search")] %>%
-    reshape2::dcast(formula = date ~ is_search, fun.aggregate = sum)
-  interim$Total <- interim$`Not referred by search` + interim$`Referred by search`
-  interim$`Not referred by search` <- round(100*interim$`Not referred by search`/interim$Total, 2)
-  interim$`Referred by search` <- round(100*interim$`Referred by search`/interim$Total, 2)
-  summary_traffic_data <<- interim[, 1:3]
+                    by = c("date", "referer_class")] %>%
+    reshape2::dcast(formula = date ~ referer_class, fun.aggregate = sum)
+  interim$Total <- interim$None + interim$`Search engine` + interim$Other
+  interim$None <- round(100*interim$None/interim$Total, 2)
+  interim$Other <- round(100*interim$Other/interim$Total, 2)
+  interim$`Search engine` <- round(100*interim$`Search engine`/interim$Total, 2)
+  names(interim) <- c("date",
+                      "Direct (not referred by anything)",
+                      "Referred by something other than search engine",
+                      "Referred by a search engine",
+                      "Total")
+  summary_traffic_data <<- interim[, 1:4]
   
   # Generate per-engine values
   interim <- data[data$search_engine != "Not referred by search",

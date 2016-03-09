@@ -1,7 +1,7 @@
 Traffic to Wikipedia Portal from external search engines
 =======
 
-This dashboard simply looks at, very broadly, where our pageviews are coming from.
+This dashboard simply looks at, very broadly, where our Portal pageviews are coming from. Direct traffic is users typing "wikipedia.org" directly into their browser or using a bookmark. It should also be noted that our request refinery only tracks top global search engines, so some search engines will make it into the "referred by something other than search engine" category despite being a search engine.
 
 General trends
 ------
