@@ -10,7 +10,8 @@ are using, and how it varies over time. The options are:
 3. **Other projects**: clicking the links to Wiktionary, Wikisource, etc. on the bottom of the page.
 4. **Primary links**: the prominent links to languages around the globe.
 5. **Search**: using the Search box and button.
-6. **Secondary links**: the less-prominent plaintext links to languages.
+6. **Other languages**: using the "Other languages" links near the bottom of the page which take you to a list of Wikipedias.
+7. **Secondary links**: the less-prominent plaintext links to languages.
 
 The values are expressed as percentages - so if a feature has the value "61.3" it is being used 61.3% of the time.
 
