@@ -8,9 +8,9 @@ General trends
 
 On average (or "average" because we use medians), traffic from search engines accounts for 1.42% of overall traffic to the Portal.
 
-Outages and inaccuracies
+Outages and notes
 ------
-None so far!
+- **A**: We switched to a finalized version of the UDF that extracts internal traffic (see [T130083](https://phabricator.wikimedia.org/T130083))
 
 Questions, bug reports, and feature suggestions
 ------

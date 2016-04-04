@@ -148,7 +148,9 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
-      dyLegend(labelsDiv = "referer_summary_legend", show = "always", width = 400)
+      dyLegend(labelsDiv = "referer_summary_legend", show = "always", width = 400) %>%
+      dyAnnotation(x = as.Date("2016-03-07"), text = "A",
+                   tooltip = "Switched to a new UDF")
   })
   
   output$search_engines_dygraph <- renderDygraph({
