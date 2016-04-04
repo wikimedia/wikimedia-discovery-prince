@@ -31,7 +31,8 @@ read_country <- function(){
 }
 
 read_useragents <- function(){
-  data <- as.data.table(polloi::read_dataset(path = "portal/user_agent_data.tsv"))
+  data <- as.data.table(polloi::read_dataset(path = "portal/user_agent_data.tsv",
+                                             col_types = "Dccd"))
   data$browser[data$browser == "Chrome Mobile"] <- "Chrome Mobile (Android)"
   data$browser[data$browser == "Chrome Mobile iOS"] <- "Chrome Mobile (iOS)"
   data$browser[data$browser == "Mobile Safari"] <- "Safari Mobile"
@@ -60,23 +61,29 @@ read_referrals <- function(){
   
   # Format
   data$is_search <- ifelse(data$is_search, "Referred by search", "Not referred by search")
-  data$search_engine[data$search_engine %in% c("none","None")] <- "Not referred by search"
+  data$search_engine[data$search_engine == "none"] <- "Not referred by search"
   
   
   # Write out the overall values for traffic
   interim <- data[, j = list(pageviews = sum(pageviews)),
                     by = c("date", "referer_class")] %>%
     reshape2::dcast(formula = date ~ referer_class, fun.aggregate = sum)
-  interim$Total <- interim$None + interim$`Search engine` + interim$Other
-  interim$None <- round(100*interim$None/interim$Total, 2)
-  interim$Other <- round(100*interim$Other/interim$Total, 2)
-  interim$`Search engine` <- round(100*interim$`Search engine`/interim$Total, 2)
+  interim$total <- apply(interim[, -1], 1, sum)
+  interim$none <- round(100*interim$none/interim$total, 2)
+  interim$unknown <- round(100*interim$unknown/interim$total, 2)
+  interim$`external (search engine)` <- round(100*interim$`external (search engine)`/interim$total, 2)
+  interim$external <- round(100*interim$external/interim$total, 2)
+  interim$internal <- round(100*interim$internal/interim$total, 2)
+  interim$`internal+external+unknown` <- round(100*interim$`internal+external+unknown`/interim$total, 2)
   names(interim) <- c("date",
-                      "Direct (not referred by anything)",
                       "Referred by something other than search engine",
                       "Referred by a search engine",
+                      "Referred internally (itself or a sister wiki)",
+                      "Referred internally, non-search-engine, and unknown",
+                      "Direct (not referred by anything)",
+                      "Unknown referers",
                       "Total")
-  summary_traffic_data <<- interim[, 1:4]
+  summary_traffic_data <<- interim[, 1:7]
   
   # Generate per-engine values
   interim <- data[data$search_engine != "Not referred by search",
