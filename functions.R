@@ -3,6 +3,8 @@ library(data.table)
 library(reshape2)
 library(magrittr)
 
+source("extras.R")
+
 # Read in the traffic data
 read_clickthrough <- function(){
   
@@ -31,23 +33,37 @@ read_country <- function(){
 }
 
 read_useragents <- function(){
-  data <- as.data.table(polloi::read_dataset(path = "portal/user_agent_data.tsv",
-                                             col_types = "Dccd"))
+  data <- polloi::read_dataset(path = "portal/user_agent_data.tsv", col_types = "Dccd")
   data$browser[data$browser == "Chrome Mobile"] <- "Chrome Mobile (Android)"
   data$browser[data$browser == "Chrome Mobile iOS"] <- "Chrome Mobile (iOS)"
   data$browser[data$browser == "Mobile Safari"] <- "Safari Mobile"
   data$version <- paste(data$browser, data$version)
+  # Add the extra browser_support_matrix information:
+  data$major_version <- suppressWarnings(as.numeric(sub(".*\\s([0-9]+)", "\\1", data$version)))
+  data$support <- suppressWarnings(apply(data[, c("browser", "major_version")], 1, function(row) {
+    return(browser_support_matrix$support[min(which(browser_support_matrix$browser %in% row['browser'] & browser_support_matrix$version <= as.numeric(row['major_version'])))])
+  }))
+  data$support[is.na(data$support)] <- "Unknown"
+  data <- as.data.table(data)
   data <- data[order(data$date, data$version),,]
   ua_data <<- data
   interim <- data[, list(percent = sum(percent)), by = c("date", "browser")]
+  # calculate approximate browser family growth rates
   browser_rates <<- interim[, list(rate = get_exp_rate(date, percent),
                                    last = tail(percent, 1),
                                    times = length(percent)),
                               by = "browser"]
-  version_rates <<- data[, list(rate = get_exp_rate(date, percent),
+  # same as above but for versions
+  version_rates <<- as.data.frame(data[, list(rate = get_exp_rate(date, percent),
+                                              last = tail(percent, 1),
+                                              times = length(percent)),
+                                         by = "version"])
+  # now calculate the growth rates for the categories of browsers as grouped by the
+  #   browser_support_matrix in extras.R, which requires a few additional steps...
+  support_rates <<- data[, list(rate = get_exp_rate(date, percent),
                                 last = tail(percent, 1),
                                 times = length(percent)),
-                         by = "version"]
+                           by = "support"]
 }
 
 read_pageviews <- function(){

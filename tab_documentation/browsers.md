@@ -9,6 +9,11 @@ Sorting options
 * __Sorting by popularity growth/decay__ uses an estimated rate (computed by fitting an exponential model).
 * __Sorting by number of times__ can be useful because a browser is only included if it has at least 0.5% share, so the number of times can be regarded as a rough estimate of longevity.
 
+Grouping options
+------
+* __Browser Family__ collapses the different versions of browsers. For example: "Chrome 40", ... , "Chrome 48" become just "Chrome".
+* __MediaWiki Support__ groups the browsers according to their support on MediaWiki. See [the browser support matrix on Compatibility page](https://www.mediawiki.org/wiki/Compatibility#Browsers) for more details, such as why Chrome Mobile (iOS & Android) and Opera Mobile are included in "Unknown" group. See [T130027](https://phabricator.wikimedia.org/T130027) for the patch notes related to this grouping option.
+
 Outages and inaccuracies
 ------
 None so far!

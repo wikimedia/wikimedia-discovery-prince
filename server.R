@@ -64,35 +64,55 @@ shinyServer(function(input, output, session){
     browsers <- switch(input$browser_order,
                        "alphabet" = {
                          if (input$group_browsers) {
-                           sort(browser_rates$browser, na.last = TRUE)
+                           if (input$browser_grouping == "family") {
+                             sort(browser_rates$browser, na.last = TRUE)
+                           } else { # "support"
+                             sort(support_rates$support, na.last = TRUE)
+                           }
                          } else {
                            sort(version_rates$version, na.last = TRUE)
                          }
                        },
                        "growth" = {
                          if (input$group_browsers) {
-                           browser_rates$browser[order(browser_rates$rate, decreasing = TRUE, na.last = TRUE)]
+                           if (input$browser_grouping == "family") {
+                             browser_rates$browser[order(browser_rates$rate, decreasing = TRUE, na.last = TRUE)]
+                           } else { # "support"
+                             support_rates$support[order(support_rates$rate, decreasing = TRUE, na.last = TRUE)]
+                           }
                          } else {
                            version_rates$version[order(version_rates$rate, decreasing = TRUE, na.last = TRUE)]
                          }
                        },
                        "decay" = {
                          if (input$group_browsers) {
-                           browser_rates$browser[order(browser_rates$rate, decreasing = FALSE, na.last = TRUE)]
+                           if (input$browser_grouping == "family") {
+                             browser_rates$browser[order(browser_rates$rate, decreasing = FALSE, na.last = TRUE)]
+                           } else { # "support"
+                             support_rates$support[order(support_rates$rate, decreasing = FALSE, na.last = TRUE)]
+                           }
                          } else {
                            version_rates$version[order(version_rates$rate, decreasing = FALSE, na.last = TRUE)]
                          }
                        },
                        "last" = {
                          if (input$group_browsers) {
-                           browser_rates$browser[order(browser_rates$last, decreasing = TRUE, na.last = TRUE)]
+                           if (input$browser_grouping == "family") {
+                             browser_rates$browser[order(browser_rates$last, decreasing = TRUE, na.last = TRUE)]
+                           } else { # "support"
+                             support_rates$support[order(support_rates$last, decreasing = TRUE, na.last = TRUE)]
+                           }
                          } else {
                            version_rates$version[order(version_rates$last, decreasing = TRUE, na.last = TRUE)]
                          }
                        },
                        "times" = {
                          if (input$group_browsers) {
-                           browser_rates$browser[order(browser_rates$times, decreasing = TRUE, na.last = TRUE)]
+                           if (input$browser_grouping == "family") {
+                             browser_rates$browser[order(browser_rates$times, decreasing = TRUE, na.last = TRUE)]
+                           } else { # "support"
+                             support_rates$support[order(support_rates$times, decreasing = TRUE, na.last = TRUE)]
+                           }
                          } else {
                            version_rates$version[order(version_rates$times, decreasing = TRUE, na.last = TRUE)]
                          }
@@ -119,10 +139,21 @@ shinyServer(function(input, output, session){
   
   output$browser_breakdown_dygraph <- renderDygraph({
     if (input$group_browsers) {
-      temp <- ua_data[ua_data$browser %in% input$browser_selector, , ] %>%
-        reshape2::dcast(date ~ browser, fun.aggregate = sum)
+      if (input$browser_grouping == "family") {
+        temp <- ua_data[ua_data$browser %in% input$browser_selector,
+                        j = list(percent = sum(percent)),
+                        by = c("date", "browser")] %>%
+          reshape2::dcast(date ~ browser, fun.aggregate = sum)
+      } else { # "support"
+        temp <- ua_data[ua_data$support %in% input$browser_selector,
+                        j = list(percent = sum(percent)),
+                        by = c("date", "support")] %>%
+          reshape2::dcast(date ~ support, fun.aggregate = sum)
+      }
     } else {
-      temp <- ua_data[ua_data$version %in% input$browser_selector, , ] %>%
+      temp <- ua_data[ua_data$version %in% input$browser_selector,
+                      j = list(percent = sum(percent)),
+                      by = c("date", "version")] %>%
         reshape2::dcast(date ~ version, fun.aggregate = sum)
     }
     temp %>%
