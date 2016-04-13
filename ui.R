@@ -26,7 +26,7 @@ sidebar <- dashboardSidebar(
                        icon = icon("external-link")),
               menuItem(text = "Global Settings",
                        selectInput(inputId = "smoothing_global", label = "Smoothing", selectize = TRUE, selected = "day",
-                                   choices = c("No Smoothing" = "day", "Weekly Median" = "week", "Monthly Median" = "month")),
+                                   choices = c("No Smoothing" = "day", "Weekly Median" = "week", "Monthly Median" = "month", "Splines" = "gam")),
                        br(style = "line-height:25%;"), icon = icon("cog", lib = "glyphicon")),
               menuItem(text = "Sharing Options", shinyURL.ui(tinyURL = FALSE),
                        p("Dashboard settings stored in URL.", style = "padding-bottom: 10px;"),
