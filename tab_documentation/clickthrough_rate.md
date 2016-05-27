@@ -5,8 +5,10 @@ A lot of people visit the [Wikipedia portal](https://www.wikipedia.org) - but wh
 
 This dashboard tracks the proportion of visits to the portal that end in a click through to one of our projects - via search or via one of the links. This is expressed as a percentage - so a value of "39.4" means that 39.4% of visits end in a clickthrough.
 
-General trends
+Notes
 ------
+
+Specifically, the clickthrough rate presented here is the overall rate without any filtering. It is the proportion of click events (by section) over the total number of landing events. By design, a single session can last indefinitely. For example, if a single session has 1000 page visits and 500 clicks, all 1500 of those events will be used in the calculation of the clickthrough rate. We are [considering](https://phabricator.wikimedia.org/T134199) surfacing the "clickthrough rate on first visit" that some of our A/B test reports use.
 
 Outages and inaccuracies
 ------
