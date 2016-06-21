@@ -10,12 +10,17 @@ read_clickthrough <- function(){
   
   # Read in and format the high-level data
   data <- as.data.table(polloi::read_dataset(path = "portal/clickthrough_rate.tsv"))
-  clickthrough_rate <<- data[, j = list(success_rate = (events[type=="clickthrough"]/sum(events))*100), by = "date"]
+  clickthrough_rate <<- data[, j = list(success_rate = (events[type == "clickthrough"]/sum(events))*100), by = "date"]
   
   # Read in and format the breakdown data
   data <- as.data.table(polloi::read_dataset(path = "portal/clickthrough_breakdown.tsv"))
-  data <- data[,j=list(section_used = section_used, proportion = (events/sum(events))*100), by = "date"]
+  data <- data[, j = list(section_used = section_used, proportion = (events/sum(events))*100), by = "date"]
   action_breakdown <<- reshape2::dcast(data, formula = date ~ section_used, fun.aggregate = sum)
+  
+  # Read in first visit clickthrough rates
+  data <- polloi::read_dataset(path = "portal/clickthrough_firstvisit.tsv")
+  data[, -1] <- data[, -1]*100 # first column is always going to be the date
+  first_visit_ctrs <<- data
   
   return(invisible())
 }

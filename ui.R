@@ -13,8 +13,9 @@ sidebar <- dashboardSidebar(
     tags$script(src = "custom.js")
   ),
   sidebarMenu(menuItem("Traffic",
-                       menuSubItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
+                       menuSubItem(text = "Clickthrough rate (CTR)", tabName = "clickthrough_rate"),
                        menuSubItem(text = "Action breakdown", tabName = "action_breakdown"),
+                       menuSubItem(text = "First visit", tabName = "first_visit"),
                        menuSubItem(text = "Dwell time", tabName = "dwell_data"),
                        menuSubItem(text = "Geographic breakdown", tabName = "country_breakdown"),
                        menuSubItem(text = "Browser breakdown", tabName = "browser_breakdown"),
@@ -47,6 +48,11 @@ body <- dashboardBody(
                 div(id = "action_breakdown_legend",
                     style = "height: 60px; padding-top: 30px; padding-left: 20px;")),
             includeMarkdown("./tab_documentation/breakdown.md")
+    ),
+    tabItem(tabName = "first_visit",
+            polloi::smooth_select("smoothing_first_visit"),
+            dygraphOutput("first_visit_dygraph"),
+            includeMarkdown("./tab_documentation/first_visit.md")
     ),
     tabItem(tabName = "dwell_data",
             polloi::smooth_select("smoothing_dwelltime"),

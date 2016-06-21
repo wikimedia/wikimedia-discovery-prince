@@ -20,7 +20,8 @@ shinyServer(function(input, output, session){
   output$clickthrough_rate_dygraph <- renderDygraph({
     clickthrough_rate %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_clickthrough_rate)) %>%
-      polloi::make_dygraph(xlab = "Date", ylab = "Clickthrough rate (%)", title = "Wikipedia portal clickthrough rate") %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "Clickthrough rate (%)",
+                           title = "Wikipedia portal clickthrough rate") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAnnotation(as.Date("2015-12-07"), text = "A",
@@ -31,13 +32,23 @@ shinyServer(function(input, output, session){
   output$action_breakdown_dygraph <- renderDygraph({
     action_breakdown %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_action_breakdown)) %>%
-      polloi::make_dygraph(xlab = "Date", ylab = "Actions (%)", title = "Actions on the Wikipedia portal") %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "Actions (%)",
+                           title = "Actions on the Wikipedia Portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyLegend(labelsDiv = "action_breakdown_legend", show = "always", width = 400) %>%
       dyAnnotation(as.Date("2015-12-07"), text = "A",
                    tooltip = "Sampling change - see below",
                    width = 12, height = 20, attachAtBottom = FALSE)
+  })
+  
+  output$first_visit_dygraph <- renderDygraph({
+    first_visit_ctrs %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_first_visit)) %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "Actions (%)",
+                           title = "Actions on the first visit to Wikipedia Portal") %>%
+      dyCSS(css = "www/inverse.css") %>%
+      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70)
   })
   
   output$dwelltime_dygraph <- renderDygraph({

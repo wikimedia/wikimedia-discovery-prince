@@ -1,4 +1,4 @@
-Wikimedia portal clickthrough rate
+Wikimedia Portal clickthrough rate
 =======
 
 A lot of people visit the [Wikipedia portal](https://www.wikipedia.org) - but what proportion actually go anywhere within our sites from it?
