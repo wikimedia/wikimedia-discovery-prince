@@ -20,7 +20,8 @@ read_clickthrough <- function(){
   # Read in first visit clickthrough rates
   data <- polloi::read_dataset(path = "portal/clickthrough_firstvisit.tsv")
   data[, -1] <- data[, -1]*100 # first column is always going to be the date
-  first_visit_ctrs <<- data
+  data$`language search` <- 0
+  first_visit_ctrs <<- as.data.frame(data[, names(action_breakdown)])
   
   return(invisible())
 }

@@ -51,7 +51,9 @@ body <- dashboardBody(
     ),
     tabItem(tabName = "first_visit",
             polloi::smooth_select("smoothing_first_visit"),
-            dygraphOutput("first_visit_dygraph"),
+            div(dygraphOutput("first_visit_dygraph"),
+                div(id = "first_visit_legend",
+                    style = "height: 60px; padding-top: 30px; padding-left: 20px;")),
             includeMarkdown("./tab_documentation/first_visit.md")
     ),
     tabItem(tabName = "dwell_data",

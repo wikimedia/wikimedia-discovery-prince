@@ -48,7 +48,8 @@ shinyServer(function(input, output, session){
       polloi::make_dygraph(xlab = "Date", ylab = "Actions (%)",
                            title = "Actions on the first visit to Wikipedia Portal") %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70)
+      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
+      dyLegend(labelsDiv = "first_visit_legend", show = "always", width = 400)
   })
   
   output$dwelltime_dygraph <- renderDygraph({
