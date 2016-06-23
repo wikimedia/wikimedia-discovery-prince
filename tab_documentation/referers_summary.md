@@ -11,6 +11,7 @@ On average (or "average" because we use medians), traffic from search engines ac
 Outages and notes
 ------
 - **A**: We switched to a finalized version of the UDF that extracts internal traffic (see [T130083](https://phabricator.wikimedia.org/T130083))
+- **B**: Started filtering out search-redirect.php requests. See [T138411](https://phabricator.wikimedia.org/T138411) for more information.
 
 Questions, bug reports, and feature suggestions
 ------

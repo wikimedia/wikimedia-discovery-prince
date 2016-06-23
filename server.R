@@ -180,7 +180,10 @@ shinyServer(function(input, output, session){
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_pageviews)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Pageviews", title = "Pageviews to the Wikipedia Portal") %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70)
+      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
+      dyAnnotation(as.Date("2016-05-01"), text = "A",
+                   tooltip = "Filtering out search-redirect.php requests",
+                   width = 12, height = 20, attachAtBottom = FALSE)
   })
   
   output$referer_summary_dygraph <- renderDygraph({
@@ -193,7 +196,10 @@ shinyServer(function(input, output, session){
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
       dyLegend(labelsDiv = "referer_summary_legend", show = "always", width = 400) %>%
       dyAnnotation(x = as.Date("2016-03-07"), text = "A",
-                   tooltip = "Switched to a new UDF")
+                   tooltip = "Switched to a new UDF") %>%
+      dyAnnotation(as.Date("2016-05-01"), text = "B",
+                   tooltip = "Filtering out search-redirect.php requests",
+                   width = 12, height = 20, attachAtBottom = FALSE)
   })
   
   output$search_engines_dygraph <- renderDygraph({

@@ -4,13 +4,9 @@ Pageviews to the portal
 This looks at, without sampling, the number of pageviews the Wikipedia Portal gets per day. This is expressed
 as raw values.
 
-General trends
+Notes
 ------
-
-Outages and inaccuracies
-------
-
-* None so far!
+- **A**: Started filtering out search-redirect.php requests. See [T138411](https://phabricator.wikimedia.org/T138411) for more information.
 
 Questions, bug reports, and feature suggestions
 ------
