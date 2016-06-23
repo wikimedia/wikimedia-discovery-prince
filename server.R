@@ -64,12 +64,39 @@ shinyServer(function(input, output, session){
   })
   
   output$country_breakdown_dygraph <- renderDygraph({
-    country_data %>%
+    if (input$group_us_regions) {
+      temp <- country_data
+      temp$`United States` <- rowSums(temp[, grepl("(United States)|(U\\.S\\. )", colnames(temp)), drop = FALSE])
+      temp <- temp[, grep("U.S.", colnames(temp), value = TRUE, invert = TRUE, fixed = TRUE)]
+    } else {
+      temp <- country_data
+    }
+    if (input$hide_less_than_5) {
+      temp[, -1] <- apply(temp[, -1], 2, function(y) {
+        return(replace(y, y < 5, NA))
+      })
+    }
+    temp %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_country_breakdown)) %>%
-      polloi::make_dygraph(xlab = "", ylab = "Users (%)", title = "Geographic breakdown of portal visitors") %>%
-      dyCSS(css = "www/inverse.css") %>%
+      { .[, apply(., 2, function(y) { return(sum(!is.na(y))) }) > 0] } %>%
+      {
+        if (ncol(.) > 13) { # Maximum colors that color brewer supports is 12
+          # If we have more than 12 countries, we need to make the dygraph manually:
+          . <- xts::xts(.[, -1], order.by = .$date)
+          dg <- dygraph(., xlab = "Date", ylab = "Users (%)", main = "Geographic breakdown of portal visitors")
+          dg <- dyOptions(dg, strokeWidth = 3, colors = colorspace::rainbow_hcl(ncol(temp)-1),
+                          drawPoints = FALSE, pointSize = 3, labelsKMB = TRUE, includeZero = TRUE)
+          dg
+        } else {
+          polloi::make_dygraph(., xlab = "Date", ylab = "Users (%)", title = "Geographic breakdown of portal visitors")
+        }
+      } %>%
+      dyLegend(labelsDiv = "country_breakdown_legend", show = "always", width = 400) %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyLegend(labelsDiv = "country_breakdown_legend", show = "always", width = 400)
+      dyCSS(css = "www/inverse.css") %>%
+      dyAnnotation(as.Date("2016-06-28"), text = "A",
+                   tooltip = "Finer (regional) U.S. traffic breakdown",
+                   width = 12, height = 20, attachAtBottom = FALSE)
   })
   
   output$browser_selector_container <- renderUI({

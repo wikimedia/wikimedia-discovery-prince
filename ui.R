@@ -62,7 +62,9 @@ body <- dashboardBody(
             includeMarkdown("./tab_documentation/dwelltime.md")
     ),
     tabItem(tabName = "country_breakdown",
-            polloi::smooth_select("smoothing_country_breakdown"),
+            fluidRow(column(polloi::smooth_select("smoothing_country_breakdown"), width = 4),
+                     column(checkboxInput("group_us_regions", "Group U.S. regions", value = FALSE), width = 4),
+                     column(checkboxInput("hide_less_than_5", "Hide countries with <5% traffic share", value = FALSE), width = 4)),
             div(dygraphOutput("country_breakdown_dygraph"),
                 div(id = "country_breakdown_legend",
                     style = "height: 60px; padding-top: 30px; padding-left: 20px;"),
