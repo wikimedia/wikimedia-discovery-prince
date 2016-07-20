@@ -76,6 +76,11 @@ shinyServer(function(input, output, session){
         return(replace(y, y < 5, NA))
       })
     }
+    if (input$hide_more_than_15) {
+      temp[, -1] <- apply(temp[, -1], 2, function(y) {
+        return(replace(y, y > 15, NA))
+      })
+    }
     temp %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_country_breakdown)) %>%
       { .[, apply(., 2, function(y) { return(sum(!is.na(y))) }) > 0] } %>%
