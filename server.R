@@ -44,7 +44,7 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyLegend(labelsDiv = "action_breakdown_legend", show = "always", width = 400) %>%
-      dyRangeSelector %>%
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
@@ -59,7 +59,7 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyLegend(labelsDiv = "most_common_legend", show = "always", width = 400) %>%
-      dyRangeSelector %>%
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
@@ -72,7 +72,7 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyLegend(labelsDiv = "first_visit_legend", show = "always", width = 400) %>%
-      dyRangeSelector %>%
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
@@ -84,7 +84,7 @@ shinyServer(function(input, output, session){
       polloi::make_dygraph(xlab = "Date", ylab = "Dwell Time (Seconds)", title = "Time spent on the Wikipedia portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyRangeSelector %>%
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
@@ -235,7 +235,7 @@ shinyServer(function(input, output, session){
       polloi::make_dygraph(xlab = "Date", ylab = "Share (%)", title = "Browser breakdown of portal visitors") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyLegend(labelsDiv = "browser_breakdown_legend", show = "always", width = 400) %>%
-      dyRangeSelector %>%
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
@@ -262,7 +262,7 @@ shinyServer(function(input, output, session){
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
       dyLegend(labelsDiv = "referer_summary_legend", show = "always", width = 400) %>%
-      dyRangeSelector %>%
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-07"), "A (UDF switch)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-01"), "B (search-redirect.php)", labelLoc = "bottom", color = "white")
   })
@@ -276,7 +276,7 @@ shinyServer(function(input, output, session){
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
       dyLegend(labelsDiv = "search_engines_legend", show = "always", width = 400) %>%
-      dyRangeSelector
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE)
   })
   
 })

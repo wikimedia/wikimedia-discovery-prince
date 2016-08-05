@@ -109,8 +109,7 @@ body <- dashboardBody(
     ),
     tabItem(tabName = "pageview_tab",
             polloi::smooth_select("smoothing_pageviews"),
-            div(dygraphOutput("pageview_dygraph"),
-                style = "background-color: white;"),
+            dygraphOutput("pageview_dygraph"),
             includeMarkdown("./tab_documentation/pageviews.md")
     ),
     tabItem(tabName = "referrals_summary",
