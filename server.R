@@ -1,3 +1,8 @@
+library(shiny)
+library(shinydashboard)
+library(dygraphs)
+library(shinyURL)
+
 source("functions.R")
 options(scipen = 500)
 
@@ -24,9 +29,11 @@ shinyServer(function(input, output, session){
                            title = "Wikipedia portal clickthrough rate") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyAnnotation(as.Date("2015-12-07"), text = "A",
-                   tooltip = "Sampling change - see below",
-                   width = 12, height = 20, attachAtBottom = FALSE)
+      dyRangeSelector %>%
+      dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
   
   output$action_breakdown_dygraph <- renderDygraph({
@@ -37,9 +44,24 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyLegend(labelsDiv = "action_breakdown_legend", show = "always", width = 400) %>%
-      dyAnnotation(as.Date("2015-12-07"), text = "A",
-                   tooltip = "Sampling change - see below",
-                   width = 12, height = 20, attachAtBottom = FALSE)
+      dyRangeSelector %>%
+      dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+  })
+  
+  output$most_common_dygraph <- renderDygraph({
+    most_common %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_most_common)) %>%
+      polloi::make_dygraph(xlab = "Date", ylab = "Visits (%)",
+                           title = "Most Common Section Per Visit") %>%
+      dyCSS(css = "www/inverse.css") %>%
+      dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
+      dyLegend(labelsDiv = "most_common_legend", show = "always", width = 400) %>%
+      dyRangeSelector %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
   
   output$first_visit_dygraph <- renderDygraph({
@@ -49,7 +71,11 @@ shinyServer(function(input, output, session){
                            title = "Actions on the first visit to Wikipedia Portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyLegend(labelsDiv = "first_visit_legend", show = "always", width = 400)
+      dyLegend(labelsDiv = "first_visit_legend", show = "always", width = 400) %>%
+      dyRangeSelector %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
   
   output$dwelltime_dygraph <- renderDygraph({
@@ -58,9 +84,11 @@ shinyServer(function(input, output, session){
       polloi::make_dygraph(xlab = "Date", ylab = "Dwell Time (Seconds)", title = "Time spent on the Wikipedia portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyAnnotation(as.Date("2015-12-07"), text = "A",
-                   tooltip = "Sampling change - see below",
-                   width = 12, height = 20, attachAtBottom = FALSE)
+      dyRangeSelector %>%
+      dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
   
   output$country_breakdown_dygraph <- renderDygraph({
@@ -99,9 +127,11 @@ shinyServer(function(input, output, session){
       dyLegend(labelsDiv = "country_breakdown_legend", show = "always", width = 400) %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyAnnotation(as.Date("2016-06-28"), text = "A",
-                   tooltip = "Finer (regional) U.S. traffic breakdown",
-                   width = 12, height = 20, attachAtBottom = FALSE)
+      dyRangeSelector %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-28"), "A (regional U.S.)", labelLoc = "bottom", color = "white")
   })
   
   output$browser_selector_container <- renderUI({
@@ -204,18 +234,23 @@ shinyServer(function(input, output, session){
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_browser_breakdown)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Share (%)", title = "Browser breakdown of portal visitors") %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyLegend(labelsDiv = "browser_breakdown_legend", show = "always", width = 400)
+      dyLegend(labelsDiv = "browser_breakdown_legend", show = "always", width = 400) %>%
+      dyRangeSelector %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
   
   output$pageview_dygraph <- renderDygraph({
     pageview_data %>%
-      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_pageviews)) %>%
+      # polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_pageviews)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Pageviews", title = "Pageviews to the Wikipedia Portal") %>%
-      dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyAnnotation(as.Date("2016-05-01"), text = "A",
-                   tooltip = "Filtering out search-redirect.php requests",
-                   width = 12, height = 20, attachAtBottom = FALSE)
+      dyRangeSelector %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-01"), "A (search-redirect.php)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
   
   output$referer_summary_dygraph <- renderDygraph({
@@ -227,11 +262,9 @@ shinyServer(function(input, output, session){
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
       dyLegend(labelsDiv = "referer_summary_legend", show = "always", width = 400) %>%
-      dyAnnotation(x = as.Date("2016-03-07"), text = "A",
-                   tooltip = "Switched to a new UDF") %>%
-      dyAnnotation(as.Date("2016-05-01"), text = "B",
-                   tooltip = "Filtering out search-redirect.php requests",
-                   width = 12, height = 20, attachAtBottom = FALSE)
+      dyRangeSelector %>%
+      dyEvent(as.Date("2016-03-07"), "A (UDF switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-01"), "B (search-redirect.php)", labelLoc = "bottom", color = "white")
   })
   
   output$search_engines_dygraph <- renderDygraph({
@@ -242,7 +275,8 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
-      dyLegend(labelsDiv = "search_engines_legend", show = "always", width = 400)
+      dyLegend(labelsDiv = "search_engines_legend", show = "always", width = 400) %>%
+      dyRangeSelector
   })
   
 })

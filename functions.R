@@ -17,6 +17,11 @@ read_clickthrough <- function(){
   data <- data[, j = list(section_used = section_used, proportion = (events/sum(events))*100), by = "date"]
   action_breakdown <<- reshape2::dcast(data, formula = date ~ section_used, fun.aggregate = sum)
   
+  # Read in most common section per visit data
+  data <- as.data.table(polloi::read_dataset(path = "portal/most_common_per_visit.tsv"))
+  data <- data[, j = list(section_used = section_used, proportion = (visits/sum(visits))*100), by = "date"]
+  most_common <<- reshape2::dcast(data, formula = date ~ section_used, fun.aggregate = sum)
+  
   # Read in first visit clickthrough rates
   data <- polloi::read_dataset(path = "portal/clickthrough_firstvisit.tsv")
   data[, -1] <- data[, -1]*100 # first column is always going to be the date

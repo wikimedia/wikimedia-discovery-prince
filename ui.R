@@ -5,18 +5,21 @@ library(shinyURL)
 options(scipen = 500)
 
 #Header elements for the visualisation
-header <- dashboardHeader(title = "Wikipedia Portal Traffic", disable = FALSE)
+header <- dashboardHeader(title = "Wikipedia.org Portal", disable = FALSE)
 
 sidebar <- dashboardSidebar(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "stylesheet.css"),
     tags$script(src = "custom.js")
   ),
-  sidebarMenu(menuItem("Traffic",
-                       menuSubItem(text = "Clickthrough rate (CTR)", tabName = "clickthrough_rate"),
-                       menuSubItem(text = "Action breakdown", tabName = "action_breakdown"),
+  sidebarMenu(menuItem("Engagement",
+                       menuSubItem(text = "Clickthrough rate", tabName = "clickthrough_rate"),
+                       menuSubItem(text = "Last action", tabName = "action_breakdown"),
+                       menuSubItem(text = "Most common section", tabName = "most_common"),
                        menuSubItem(text = "First visit", tabName = "first_visit"),
                        menuSubItem(text = "Dwell time", tabName = "dwell_data"),
+                       icon = icon("hand-o-up")),
+              menuItem("Traffic",
                        menuSubItem(text = "Geographic breakdown", tabName = "country_breakdown"),
                        menuSubItem(text = "Browser breakdown", tabName = "browser_breakdown"),
                        menuSubItem(text = "Pageviews", tabName = "pageview_tab"),
@@ -48,7 +51,14 @@ body <- dashboardBody(
             div(dygraphOutput("action_breakdown_dygraph"),
                 div(id = "action_breakdown_legend",
                     style = "height: 60px; padding-top: 30px; padding-left: 20px;")),
-            includeMarkdown("./tab_documentation/breakdown.md")
+            includeMarkdown("./tab_documentation/action_breakdown.md")
+    ),
+    tabItem(tabName = "most_common",
+            polloi::smooth_select("smoothing_most_common"),
+            div(dygraphOutput("most_common_dygraph"),
+                div(id = "most_common_legend",
+                    style = "height: 60px; padding-top: 30px; padding-left: 20px;")),
+            includeMarkdown("./tab_documentation/most_common.md")
     ),
     tabItem(tabName = "first_visit",
             polloi::smooth_select("smoothing_first_visit"),
@@ -99,7 +109,8 @@ body <- dashboardBody(
     ),
     tabItem(tabName = "pageview_tab",
             polloi::smooth_select("smoothing_pageviews"),
-            dygraphOutput("pageview_dygraph"),
+            div(dygraphOutput("pageview_dygraph"),
+                style = "background-color: white;"),
             includeMarkdown("./tab_documentation/pageviews.md")
     ),
     tabItem(tabName = "referrals_summary",
