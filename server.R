@@ -10,13 +10,14 @@ existing_date <- Sys.Date() - 1
 
 shinyServer(function(input, output, session){
   
-  if(Sys.Date() != existing_date) {
+  if (Sys.Date() != existing_date) {
     read_clickthrough()
+    read_langs()
     read_dwelltime()
     read_country()
-		read_useragents()
-		read_pageviews()
-		read_referrals()
+    read_useragents()
+    read_pageviews()
+    read_referrals()
     existing_date <<- Sys.Date()
   }
   
@@ -29,7 +30,8 @@ shinyServer(function(input, output, session){
                            title = "Wikipedia portal clickthrough rate") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyRangeSelector %>%
+      dyLegend(labelsDiv = "clickthrough_rate_legend", show = "always") %>%
+      dyRangeSelector(strokeColor = "white", fillColor = "gray", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
@@ -43,7 +45,7 @@ shinyServer(function(input, output, session){
                            title = "Actions on the Wikipedia Portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyLegend(labelsDiv = "action_breakdown_legend", show = "always", width = 400) %>%
+      dyLegend(labelsDiv = "action_breakdown_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
@@ -58,7 +60,7 @@ shinyServer(function(input, output, session){
                            title = "Most Common Section Per Visit") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyLegend(labelsDiv = "most_common_legend", show = "always", width = 400) %>%
+      dyLegend(labelsDiv = "most_common_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
@@ -71,7 +73,7 @@ shinyServer(function(input, output, session){
                            title = "Actions on the first visit to Wikipedia Portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyLegend(labelsDiv = "first_visit_legend", show = "always", width = 400) %>%
+      dyLegend(labelsDiv = "first_visit_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
@@ -84,6 +86,7 @@ shinyServer(function(input, output, session){
       polloi::make_dygraph(xlab = "Date", ylab = "Dwell Time (Seconds)", title = "Time spent on the Wikipedia portal") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
+      dyLegend(labelsDiv = "dwelltime_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
@@ -127,7 +130,7 @@ shinyServer(function(input, output, session){
       dyLegend(labelsDiv = "country_breakdown_legend", show = "always", width = 400) %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyRangeSelector %>%
+      dyRangeSelector(strokeColor = "white", fillColor = "gray", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
@@ -243,10 +246,12 @@ shinyServer(function(input, output, session){
   
   output$pageview_dygraph <- renderDygraph({
     pageview_data %>%
-      # polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_pageviews)) %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_pageviews)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Pageviews", title = "Pageviews to the Wikipedia Portal") %>%
+      dyLegend(labelsDiv = "pageview_legend", show = "always") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyRangeSelector %>%
+      dyAxis("y", logscale = input$pageview_logscale) %>%
+      dyRangeSelector(strokeColor = "white", fillColor = "gray", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-01"), "A (search-redirect.php)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
@@ -261,7 +266,7 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
-      dyLegend(labelsDiv = "referer_summary_legend", show = "always", width = 400) %>%
+      dyLegend(labelsDiv = "referer_summary_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-07"), "A (UDF switch)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-01"), "B (search-redirect.php)", labelLoc = "bottom", color = "white")
@@ -275,8 +280,160 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
-      dyLegend(labelsDiv = "search_engines_legend", show = "always", width = 400) %>%
+      dyLegend(labelsDiv = "search_engines_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE)
+  })
+  
+  output$s_dygraph <- renderDygraph({
+    
+    if (!input$s_enwiki) {
+      idx <- langs_visited$prefix != "en"
+    } else {
+      idx <- TRUE
+    }
+    
+    if (input$s_response == "clicks") {
+      if (input$s_type == "count") {
+        data4dygraph <- langs_visited[idx,
+                                      list(
+                                        "total clicks" = sum(clicks),
+                                        search = sum(search),
+                                        primary = sum(primary),
+                                        secondary = sum(secondary)
+                                      ),
+                                      by = c("date")]
+      } else { # == "prop"
+        data4dygraph <- langs_visited[idx,
+                                      list(
+                                        search = round(100*sum(search)/sum(clicks), 2),
+                                        primary = round(100*sum(primary)/sum(clicks), 2),
+                                        secondary = round(100*sum(secondary)/sum(clicks), 2)
+                                      ),
+                                      by = c("date")]
+      }
+      dyout <- data4dygraph %>%
+        fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
+        polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_summary)) %>%
+        polloi::make_dygraph(xlab = "Date",
+                             ylab = ifelse(input$s_type == "prop", "Proportion of total clicks (%)", "Clicks"),
+                             title = paste("Clicks to Wikipedias ", ifelse(input$s_enwiki, "(All Languages)", "(All Except English)"), " from Wikipedia.org")) %>%
+        dyRangeSelector(
+          fillColor = ifelse(input$s_type == "prop", "", "gray"),
+          strokeColor = ifelse(input$s_type == "prop", "", "white"),
+          retainDateWindow = TRUE)
+    } else { # == "users"
+      dyout <- langs_visited[, list(users = sum(sessions)), by = "date"] %>%
+        fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
+        polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_summary)) %>%
+        polloi::make_dygraph(xlab = "Date", ylab = "Unique sessions", title = "Number of users who visited a Wikipedia from Portal") %>%
+        dyRangeSelector(fillColor = "gray", strokeColor = "white", retainDateWindow = TRUE)
+    }
+    dyout %>%
+      dyOptions(strokeWidth = 3, labelsKMB = TRUE, drawPoints = FALSE, pointSize = 3, includeZero = TRUE,
+                logscale = input$s_response == "clicks" && input$s_type == "count" && input$s_logscale) %>%
+      dyLegend(width = 400, labelsDiv = "s_legend", show = "always") %>%
+      dyCSS(css = system.file("custom.css", package = "polloi")) %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+  })
+  
+  lv_reactive <- reactiveValues(choices = NULL, selected_langs = NULL)
+  
+  observeEvent(input$lv_selectall, {
+    lv_reactive$selected_langs <- lv_reactive$choices
+  })
+  
+  observeEvent(input$lv_sort, {
+    if (input$lv_sort %in% c("alphabet_az", "alphabet_za")) {
+      lv_reactive$choices <- sort(unique(langs_visited$language), decreasing = input$lv_sort == "alphabet_za")
+    } else {
+      languages <- langs_visited[, list(
+        clicks = sum(clicks),
+        users = sum(sessions),
+        avg_daily_clicks = as.integer(median(clicks)),
+        avg_daily_users = as.integer(median(sessions))),
+        by = "language"]
+      lv_reactive$choices <- switch(input$lv_sort,
+                                    clicks_high2low = {
+                                      languages$language[order(languages[[input$lv_response]], decreasing = TRUE)]
+                                    },
+                                    clicks_low2high = {
+                                      languages$language[order(languages[[input$lv_response]], decreasing = FALSE)]
+                                    },
+                                    avg_clicks_high2low = {
+                                      languages$language[order(languages[[ifelse(input$lv_response == "clicks", "avg_daily_clicks", "avg_daily_users")]], decreasing = TRUE)]
+                                    },
+                                    avg_clicks_low2high = {
+                                      languages$language[order(languages[[ifelse(input$lv_response == "clicks", "avg_daily_clicks", "avg_daily_users")]], decreasing = FALSE)]
+                                    },
+                                    top10 = {
+                                      sort(languages$language[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10)], decreasing = FALSE)
+                                    },
+                                    bottom50 = {
+                                      sort(languages$language[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50)], decreasing = FALSE)
+                                    })
+    }
+    if (!is.null(input$lv_languages)) {
+      if (sum(input$lv_languages %in% lv_reactive$choices) == 0) {
+        lv_reactive$selected_langs <- lv_reactive$choices[1]
+      } else {
+        # Lets us keep selected languages when switching betweeen clicks and users
+        lv_reactive$selected_langs <- intersect(input$lv_languages, lv_reactive$choices)
+      }
+    }
+    if (is.null(input$lv_languages)) {
+      lv_reactive$selected_langs <- lv_reactive$choices[1]
+    }
+  })
+  
+  output$lv_languages_container <- renderUI({
+    selectInput("lv_languages", label = "Wikipedia languages", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE)
+  })
+  
+  output$lv_dygraph <- renderDygraph({
+    if (input$lv_response == "clicks") {
+      if (length(input$lv_languages) > 1) {
+        data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "clicks"), with = FALSE] %>%
+          tidyr::spread(language, clicks, fill = 0) %>%
+          fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date))
+      } else {
+        if (input$lv_type == "count") {
+          data4dygraph <- langs_visited[langs_visited$language == input$lv_languages, c("date", "clicks", "search", "primary", "secondary"), with = FALSE] %>%
+            fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date))
+        } else { # == "prop"
+          data4dygraph <- langs_visited[langs_visited$language == input$lv_languages, c("date", "clicks", "search", "primary", "secondary"), with = FALSE] %>%
+            fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date))
+          data4dygraph$search <- round(100*data4dygraph$search/data4dygraph$clicks, 2)
+          data4dygraph$primary <- round(100*data4dygraph$primary/data4dygraph$clicks, 2)
+          data4dygraph$secondary <- round(100*data4dygraph$secondary/data4dygraph$clicks, 2)
+          data4dygraph$clicks <- NULL
+        }
+      }
+    } else { # == "users"
+      data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "sessions"), with = FALSE] %>%
+        tidyr::spread(language, sessions, fill = 0) %>%
+        fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date))
+    }
+    data4dygraph %>%
+    {
+      tryCatch(polloi::smoother(., smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_lv)),
+               error = function(e) {
+                 stop("Cannot apply spline smoothing on one or more of the selected languages.")
+               }, finally = NULL)
+    } %>%
+      polloi::make_dygraph(xlab = "Date", ylab = ifelse(input$lv_response == "clicks", ifelse(input$lv_type == "count", "Clicks", "Proportion of total clicks (%)"), "Unique sessions"),
+                           title = paste0(ifelse(input$lv_response == "clicks", "Clicks", "Users who went"), " to ", paste0(input$lv_languages, collapse = ", ")," Wikipedia", ifelse(length(input$lv_languages) > 1, "s", ""), " from Portal")) %>%
+      dyRangeSelector(fillColor = ifelse(input$lv_type == "prop", "", "gray"),
+                      strokeColor = ifelse(input$lv_type == "prop", "", "white"),
+                      retainDateWindow = TRUE) %>%
+      dyOptions(strokeWidth = 3, labelsKMB = TRUE, drawPoints = FALSE, pointSize = 3, includeZero = TRUE,
+                logscale = input$lv_logscale && input$lv_type == "count") %>%
+      dyLegend(width = 400, labelsDiv = "lv_legend", show = "always") %>%
+      dyCSS(css = system.file("custom.css", package = "polloi")) %>%
+      dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
   })
   
 })

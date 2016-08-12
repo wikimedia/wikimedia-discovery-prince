@@ -31,6 +31,11 @@ read_clickthrough <- function(){
   return(invisible())
 }
 
+read_langs <- function() {
+  data <- as.data.table(read_dataset(path = "portal/language_destination.tsv"))
+  langs_visited <<- as.data.table(dplyr::left_join(data, get_prefixes()[, -2], by = "prefix"))
+}
+
 read_dwelltime <- function(){
   dwelltime_data <<- as.data.table(polloi::read_dataset(path = "portal/dwell_metrics.tsv"))
 }
@@ -121,6 +126,24 @@ read_referrals <- function(){
   
   return(invisible())
   
+}
+
+fill_out <- function(x, start_date, end_date, fill = 0) {
+  temp <- data.frame(date = seq(start_date, end_date, "day"))
+  y <- dplyr::right_join(x, temp, by = "date")
+  y[is.na(y)] <- fill
+  return(y)
+}
+
+smart_palette <- function(n_colors) {
+  if (n_colors <= 9) {
+    return(RColorBrewer::brewer.pal(max(3, n_colors), "Set1"))
+  }
+  else if (n_colors < 12) {
+    return(RColorBrewer::brewer.pal(n_colors, "Set3"))
+  } else {
+    return(colorspace::rainbow_hcl(n_colors))
+  }
 }
 
 # Fits an exponential model to the data and returns the rate of growth (or decay!)
