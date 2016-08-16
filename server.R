@@ -408,7 +408,8 @@ shinyServer(function(input, output, session){
       if (length(input$lv_languages) > 1) {
         data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "clicks"), with = FALSE] %>%
           tidyr::spread(language, clicks, fill = 0) %>%
-          fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date))
+          fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
+          { .[, c("date", input$lv_languages)] }
       } else {
         if (input$lv_type == "count") {
           data4dygraph <- langs_visited[langs_visited$language == input$lv_languages, c("date", "clicks", "search", "primary", "secondary"), with = FALSE] %>%
@@ -425,7 +426,8 @@ shinyServer(function(input, output, session){
     } else { # == "users"
       data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "sessions"), with = FALSE] %>%
         tidyr::spread(language, sessions, fill = 0) %>%
-        fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date))
+        fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
+        { .[, c("date", input$lv_languages)] }
     }
     data4dygraph[is.na(data4dygraph)] <- 0
     data4dygraph %>%
