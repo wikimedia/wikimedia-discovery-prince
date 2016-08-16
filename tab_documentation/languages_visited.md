@@ -6,9 +6,11 @@ While the [summary panel](http://discovery-experimental.wmflabs.org/portal/#summ
 
 When looking at clicks, you can view counts or proportions to see how much of the traffic comes from the three sections:
 
-- **search**: wikipedia.org visitors can search Wikipedias in different languages and end up on specific articles, in which case we know the language of the Wikipedia they visited. If they did not find a specific article, they are taken to all a search results page, in which case we will not know the language of the Wikipedia they visited.
-- **primary**: the links around the Wikipedia globe logo, which are dynamically placed and sorted according to each visitor's language preferences.
+- **search**: wikipedia.org visitors can search Wikipedia's in different languages and end up on specific articles and we log the language of the Wikipedia they visited. If the visitor did not find a specific article during their initial query from the search metadata that is displayed, or by hitting 'Enter', they will be redirected to a default search results page in the language that they searched in (even if they changed the language in the small dropdown in the search box while on the Portal). However, at this time the search-box language selection change is not logged.
+- **primary**: the links around the Wikipedia globe logo, which are dynamically placed and sorted according to each visitor's browser's language preferences.
 - **secondary**: the links below the Wikipedia globe logo, which the wikipedia.org visitor can use to find a version of Wikipedia in any of the almost 300 languages.
+
+**Note**: Sister project link clickthroughs are not tracked on this page, see [this page](http://discovery.wmflabs.org/portal/#most_common) for more info.
 
 Viewing count/proportional breakdown of clicks is only available when a single language is selected. When multiple languages are selected, only the total number of clicks of the three sections is shown for each language.
 

@@ -116,7 +116,7 @@ body <- dashboardBody(
                        div(polloi::smooth_select("smoothing_browser_breakdown"),
                                 dygraphOutput("browser_breakdown_dygraph"),
                                 div(id = "browser_breakdown_legend", class = "large",
-                                    style = "height: 60px; padding-top: 30px; padding-left: 20px;"),
+                                    style = "padding: 30px 0 10px 20px;"),
                                 style = "width: 100%; background-color: #222D32; color: #ECF0F5; padding-top: 10px;"),
                             width = 9)),
             includeMarkdown("./tab_documentation/browsers.md")
@@ -157,7 +157,7 @@ body <- dashboardBody(
                                 checkboxInput("s_logscale", "Use Log scale", FALSE)), width = 2)
       ),
       dygraphOutput("s_dygraph"),
-      div(id = "s_legend", class = "large", style = "height: 20px; text-align: center; padding-top: 10px;"),
+      div(id = "s_legend", class = "large", style = "text-align: center; padding: 0 10px;"),
       includeMarkdown("tab_documentation/languages_summary.md")
     ),
     tabItem(
@@ -166,14 +166,15 @@ body <- dashboardBody(
         column(polloi::smooth_select("smoothing_lv"), width = 2),
         column(radioButtons("lv_response", "Data", list("Clicks" = "clicks", "Users" = "users"), inline = TRUE), width = 2),
         column(selectInput("lv_sort", "Sort languages",
-                           list("Alphabetically (A-Z)" = "alphabet_az",
-                                "Alphabetically (Z-A)" = "alphabet_za",
+                           list("Top 10" = "top10",
+                                "Bottom 50" = "bottom50",
                                 "Overall Clicks (High to Low)" = "clicks_high2low",
                                 "Overall Clicks (Low to High)" = "clicks_low2high",
-                                "Median Daily Clicks (High to Low)" = "avg_clicks_high2low",
-                                "Median Daily Clicks (Low to High)" = "avg_clicks_low2high",
-                                "Top 10" = "top10",
-                                "Bottom 50" = "bottom50")),
+                                "Daily Clicks (High to Low)" = "avg_clicks_high2low",
+                                "Daily Clicks (Low to High)" = "avg_clicks_low2high",
+                                "Alphabetically (A-Z)" = "alphabet_az",
+                                "Alphabetically (Z-A)" = "alphabet_za"),
+                           "top10"),
                width = 3),
         column(
           uiOutput("lv_languages_container", style = "width: 80%; display: inline-block; float: left;",
@@ -189,7 +190,7 @@ body <- dashboardBody(
           width = 2)
       ),
       dygraphOutput("lv_dygraph"),
-      div(id = "lv_legend", class = "large", style = "height: 20px; text-align: center; padding-top: 10px;"),
+      div(id = "lv_legend", class = "large", style = "text-align: center; padding: 0 10px;"),
       includeMarkdown("tab_documentation/languages_visited.md")
     )
   )

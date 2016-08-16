@@ -326,13 +326,14 @@ shinyServer(function(input, output, session){
         fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
         polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_summary)) %>%
         polloi::make_dygraph(xlab = "Date", ylab = "Unique sessions", title = paste("Users who went to Wikipedias ", ifelse(input$s_enwiki, "(All Languages)", "(All Except English)"), " from Wikipedia.org")) %>%
+        dyCSS(css = "www/inverse.css") %>%
         dyRangeSelector(fillColor = "gray", strokeColor = "white", retainDateWindow = TRUE)
     }
     dyout %>%
       dyOptions(strokeWidth = 3, labelsKMB = TRUE, drawPoints = FALSE, pointSize = 3, includeZero = TRUE,
                 logscale = input$s_response == "clicks" && input$s_type == "count" && input$s_logscale) %>%
       dyLegend(width = 400, labelsDiv = "s_legend", show = "always") %>%
-      dyCSS(css = system.file("custom.css", package = "polloi")) %>%
+      dyCSS(css = "www/inverse.css") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
@@ -368,27 +369,38 @@ shinyServer(function(input, output, session){
                                       languages$language[order(languages[[ifelse(input$lv_response == "clicks", "avg_daily_clicks", "avg_daily_users")]], decreasing = FALSE)]
                                     },
                                     top10 = {
-                                      sort(languages$language[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10)], decreasing = FALSE)
+                                      dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10), ], desc(clicks))$language
                                     },
                                     bottom50 = {
-                                      sort(languages$language[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50)], decreasing = FALSE)
+                                      dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(clicks))$language
                                     })
     }
     if (!is.null(input$lv_languages)) {
       if (sum(input$lv_languages %in% lv_reactive$choices) == 0) {
-        lv_reactive$selected_langs <- lv_reactive$choices[1]
+        if (input$lv_sort == "top10") {
+          lv_reactive$selected_langs <- lv_reactive$choices
+        } else {
+          lv_reactive$selected_langs <- lv_reactive$choices[1]
+        }
       } else {
         # Lets us keep selected languages when switching betweeen clicks and users
         lv_reactive$selected_langs <- intersect(input$lv_languages, lv_reactive$choices)
       }
-    }
-    if (is.null(input$lv_languages)) {
-      lv_reactive$selected_langs <- lv_reactive$choices[1]
+    } else {
+      if (input$lv_sort == "top10") {
+        lv_reactive$selected_langs <- lv_reactive$choices
+      } else {
+        lv_reactive$selected_langs <- lv_reactive$choices[1]
+      }
     }
   })
   
   output$lv_languages_container <- renderUI({
-    selectInput("lv_languages", label = "Wikipedia languages", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE)
+    selectizeInput("lv_languages", "Wikipedia languages", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12))
+  })
+  
+  observeEvent(input$lv_languages, {
+    lv_reactive$selected_langs <- input$lv_languages
   })
   
   output$lv_dygraph <- renderDygraph({
@@ -431,7 +443,7 @@ shinyServer(function(input, output, session){
       dyOptions(strokeWidth = 3, labelsKMB = TRUE, drawPoints = FALSE, pointSize = 3, includeZero = TRUE,
                 logscale = input$lv_logscale && input$lv_type == "count") %>%
       dyLegend(width = 400, labelsDiv = "lv_legend", show = "always") %>%
-      dyCSS(css = system.file("custom.css", package = "polloi")) %>%
+      dyCSS(css = "www/inverse.css") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
