@@ -322,10 +322,10 @@ shinyServer(function(input, output, session){
           strokeColor = ifelse(input$s_type == "prop", "", "white"),
           retainDateWindow = TRUE)
     } else { # == "users"
-      dyout <- langs_visited[, list(users = sum(sessions)), by = "date"] %>%
+      dyout <- langs_visited[idx, list(users = sum(sessions)), by = "date"] %>%
         fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
         polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_summary)) %>%
-        polloi::make_dygraph(xlab = "Date", ylab = "Unique sessions", title = "Number of users who visited a Wikipedia from Portal") %>%
+        polloi::make_dygraph(xlab = "Date", ylab = "Unique sessions", title = paste("Users who went to Wikipedias ", ifelse(input$s_enwiki, "(All Languages)", "(All Except English)"), " from Wikipedia.org")) %>%
         dyRangeSelector(fillColor = "gray", strokeColor = "white", retainDateWindow = TRUE)
     }
     dyout %>%
@@ -415,6 +415,7 @@ shinyServer(function(input, output, session){
         tidyr::spread(language, sessions, fill = 0) %>%
         fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date))
     }
+    data4dygraph[is.na(data4dygraph)] <- 0
     data4dygraph %>%
     {
       tryCatch(polloi::smoother(., smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_lv)),
