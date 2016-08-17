@@ -178,7 +178,7 @@ body <- dashboardBody(
                width = 3),
         column(
           uiOutput("lv_languages_container", style = "width: 80%; display: inline-block; float: left;",
-                   title = "Type to find a language. Use backspace key to remove a selected language."),
+                   title = "Type to find a language. Use backspace key to remove a selected language. Up to 12 languages can be selected at the same time."),
                    div(icon("question-circle", class = "fa-lg"),
                        title = "Type to find a language. Use backspace key to remove a selected language.",
                        style="width: 12.5%; margin-left: 2.5%; padding-top: 30px; height: 34px; display: inline-block; float: left;"),

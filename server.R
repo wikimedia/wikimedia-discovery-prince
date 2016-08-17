@@ -11,13 +11,23 @@ existing_date <- Sys.Date() - 1
 shinyServer(function(input, output, session){
   
   if (Sys.Date() != existing_date) {
+    progress <- shiny::Progress$new(session, min = 0, max = 1)
+    on.exit(progress$close())
+    progress$set(message = "Downloading clickthrough data...", value = 0)
     read_clickthrough()
+    progress$set(message = "Downloading language visit data...", value = 1/7)
     read_langs()
+    progress$set(message = "Downloading dwell-time data...", value = 2/7)
     read_dwelltime()
+    progress$set(message = "Downloading country data data...", value = 3/7)
     read_country()
+    progress$set(message = "Downloading user-agent data...", value = 4/7)
     read_useragents()
+    progress$set(message = "Downloading pageview data...", value = 5/7)
     read_pageviews()
+    progress$set(message = "Downloading referral data...", value = 6/7)
     read_referrals()
+    progress$set(message = "Finished downloading datasets.", value = 1)
     existing_date <<- Sys.Date()
   }
   
@@ -35,7 +45,8 @@ shinyServer(function(input, output, session){
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$action_breakdown_dygraph <- renderDygraph({
@@ -50,7 +61,8 @@ shinyServer(function(input, output, session){
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$most_common_dygraph <- renderDygraph({
@@ -63,7 +75,8 @@ shinyServer(function(input, output, session){
       dyLegend(labelsDiv = "most_common_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$first_visit_dygraph <- renderDygraph({
@@ -77,7 +90,8 @@ shinyServer(function(input, output, session){
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$dwelltime_dygraph <- renderDygraph({
@@ -91,7 +105,8 @@ shinyServer(function(input, output, session){
       dyEvent(as.Date("2015-12-07"), "A (sampling change)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$country_breakdown_dygraph <- renderDygraph({
@@ -134,7 +149,8 @@ shinyServer(function(input, output, session){
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-28"), "A (regional U.S.)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-28"), "A (regional U.S.)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$browser_selector_container <- renderUI({
@@ -241,7 +257,8 @@ shinyServer(function(input, output, session){
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$pageview_dygraph <- renderDygraph({
@@ -255,7 +272,8 @@ shinyServer(function(input, output, session){
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-01"), "A (search-redirect.php)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   output$referer_summary_dygraph <- renderDygraph({
@@ -336,7 +354,8 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
   lv_reactive <- reactiveValues(choices = NULL, selected_langs = NULL)
@@ -369,16 +388,26 @@ shinyServer(function(input, output, session){
                                       languages$language[order(languages[[ifelse(input$lv_response == "clicks", "avg_daily_clicks", "avg_daily_users")]], decreasing = FALSE)]
                                     },
                                     top10 = {
-                                      dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10), ], desc(clicks))$language
+                                      if (input$lv_response == "users") {
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10), ], desc(users))$language
+                                      } else {
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10), ], desc(clicks))$language
+                                      }
                                     },
                                     bottom50 = {
-                                      dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(clicks))$language
+                                      if (input$lv_response == "users") {
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(users))$language
+                                      } else {
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(clicks))$language
+                                      }
                                     })
     }
     if (!is.null(input$lv_languages)) {
       if (sum(input$lv_languages %in% lv_reactive$choices) == 0) {
         if (input$lv_sort == "top10") {
           lv_reactive$selected_langs <- lv_reactive$choices
+        } else if (input$lv_sort == "bottom50") {
+          lv_reactive$selected_langs <- tail(lv_reactive$choices, 12)
         } else {
           lv_reactive$selected_langs <- lv_reactive$choices[1]
         }
@@ -389,6 +418,8 @@ shinyServer(function(input, output, session){
     } else {
       if (input$lv_sort == "top10") {
         lv_reactive$selected_langs <- lv_reactive$choices
+      } else if (input$lv_sort == "bottom50") {
+        lv_reactive$selected_langs <- tail(lv_reactive$choices, 12)
       } else {
         lv_reactive$selected_langs <- lv_reactive$choices[1]
       }
@@ -396,7 +427,7 @@ shinyServer(function(input, output, session){
   })
   
   output$lv_languages_container <- renderUI({
-    selectizeInput("lv_languages", "Wikipedia languages", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12))
+    selectizeInput("lv_languages", "Wikipedia languages (12 max)", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12))
   })
   
   observeEvent(input$lv_languages, {
@@ -448,7 +479,8 @@ shinyServer(function(input, output, session){
       dyCSS(css = "www/inverse.css") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
 })
