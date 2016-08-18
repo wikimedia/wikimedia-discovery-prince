@@ -167,7 +167,7 @@ body <- dashboardBody(
         column(radioButtons("lv_response", "Data", list("Clicks" = "clicks", "Users" = "users"), inline = TRUE), width = 2),
         column(selectInput("lv_sort", "Sort languages",
                            list("Top 10" = "top10",
-                                "Bottom 50" = "bottom50",
+                                "Bottom 10" = "bottom10",
                                 "Overall Clicks (High to Low)" = "clicks_high2low",
                                 "Overall Clicks (Low to High)" = "clicks_low2high",
                                 "Daily Clicks (High to Low)" = "avg_clicks_high2low",
@@ -184,7 +184,7 @@ body <- dashboardBody(
                        style="width: 12.5%; margin-left: 2.5%; padding-top: 30px; height: 34px; display: inline-block; float: left;"),
           width = 3),
         column(
-          conditionalPanel("input.lv_sort === 'top10'", actionButton("lv_selectall", "Select all top 10", style = "margin-bottom: 5px;")),
+          conditionalPanel("input.lv_sort === 'top10' | input.lv_sort === 'bottom10'", actionButton("lv_selectall", "Select all 10", style = "margin-bottom: 5px;")),
           conditionalPanel("input.lv_response === 'clicks' & input.lv_languages.length < 2", radioButtons("lv_type", "Type", list("Counts" = "count", "Proportions" = "prop"), inline = TRUE)),
           conditionalPanel("input.lv_type === 'count'", checkboxInput("lv_logscale", "Use Log scale", FALSE)),
           width = 2)

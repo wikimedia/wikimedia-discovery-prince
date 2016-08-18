@@ -394,20 +394,18 @@ shinyServer(function(input, output, session){
                                         dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10), ], desc(clicks))$language
                                       }
                                     },
-                                    bottom50 = {
+                                    bottom10 = {
                                       if (input$lv_response == "users") {
-                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(users))$language
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 10), ], desc(users))$language
                                       } else {
-                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(clicks))$language
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 10), ], desc(clicks))$language
                                       }
                                     })
     }
     if (!is.null(input$lv_languages)) {
       if (sum(input$lv_languages %in% lv_reactive$choices) == 0) {
-        if (input$lv_sort == "top10") {
+        if (input$lv_sort %in% c("top10", "bottom10")) {
           lv_reactive$selected_langs <- lv_reactive$choices
-        } else if (input$lv_sort == "bottom50") {
-          lv_reactive$selected_langs <- tail(lv_reactive$choices, 12)
         } else {
           lv_reactive$selected_langs <- lv_reactive$choices[1]
         }
@@ -416,10 +414,8 @@ shinyServer(function(input, output, session){
         lv_reactive$selected_langs <- intersect(input$lv_languages, lv_reactive$choices)
       }
     } else {
-      if (input$lv_sort == "top10") {
+      if (input$lv_sort %in% c("top10", "bottom10")) {
         lv_reactive$selected_langs <- lv_reactive$choices
-      } else if (input$lv_sort == "bottom50") {
-        lv_reactive$selected_langs <- tail(lv_reactive$choices, 12)
       } else {
         lv_reactive$selected_langs <- lv_reactive$choices[1]
       }
