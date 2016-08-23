@@ -8,6 +8,7 @@ options(scipen = 500)
 header <- dashboardHeader(title = "Wikipedia.org Portal", disable = FALSE)
 
 sidebar <- dashboardSidebar(
+  shinyjs::useShinyjs(),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "stylesheet.css"),
     tags$script(src = "custom.js")
@@ -167,7 +168,7 @@ body <- dashboardBody(
         column(radioButtons("lv_response", "Data", list("Clicks" = "clicks", "Users" = "users"), inline = TRUE), width = 2),
         column(selectInput("lv_sort", "Sort languages",
                            list("Top 10" = "top10",
-                                "Bottom 10" = "bottom10",
+                                "Bottom 50" = "bottom50",
                                 "Overall Clicks (High to Low)" = "clicks_high2low",
                                 "Overall Clicks (Low to High)" = "clicks_low2high",
                                 "Daily Clicks (High to Low)" = "avg_clicks_high2low",
@@ -182,11 +183,11 @@ body <- dashboardBody(
                    div(icon("question-circle", class = "fa-lg"),
                        title = "Type to find a language. Use backspace key to remove a selected language.",
                        style="width: 12.5%; margin-left: 2.5%; padding-top: 30px; height: 34px; display: inline-block; float: left;"),
+          conditionalPanel("input.lv_sort === 'bottom50' & input.lv_response === 'clicks'", HTML("<label class = \"control-label\" style = \"margin-bottom:-30px;\">Aggregation</label>"), checkboxInput("lv_bottom50_combine", "Combine languages", FALSE)),
           width = 3),
         column(
-          conditionalPanel("input.lv_sort === 'top10' | input.lv_sort === 'bottom10'", actionButton("lv_selectall", "Select all 10", style = "margin-bottom: 5px;")),
           conditionalPanel("input.lv_response === 'clicks' & input.lv_languages.length < 2", radioButtons("lv_type", "Type", list("Counts" = "count", "Proportions" = "prop"), inline = TRUE)),
-          conditionalPanel("input.lv_type === 'count'", checkboxInput("lv_logscale", "Use Log scale", FALSE)),
+          conditionalPanel("input.lv_type === 'count'", HTML("<label class = \"control-label\" style = \"margin-bottom:-30px;\">Scale</label>"), checkboxInput("lv_logscale", "Use Log scale", FALSE)),
           width = 2)
       ),
       dygraphOutput("lv_dygraph"),

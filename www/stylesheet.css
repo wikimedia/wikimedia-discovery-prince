@@ -60,3 +60,7 @@ a {
 .large {
   font-size: large;
 }
+
+.tiny {
+  font-size: small;
+}

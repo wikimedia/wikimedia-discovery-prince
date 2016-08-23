@@ -2,13 +2,14 @@ library(shiny)
 library(shinydashboard)
 library(dygraphs)
 library(shinyURL)
+library(shinyjs)
 
 source("functions.R")
 options(scipen = 500)
 
 existing_date <- Sys.Date() - 1
 
-shinyServer(function(input, output, session){
+shinyServer(function(input, output, session) {
   
   if (Sys.Date() != existing_date) {
     progress <- shiny::Progress$new(session, min = 0, max = 1)
@@ -130,18 +131,7 @@ shinyServer(function(input, output, session){
     temp %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_country_breakdown)) %>%
       { .[, apply(., 2, function(y) { return(sum(!is.na(y))) }) > 0] } %>%
-      {
-        if (ncol(.) > 13) { # Maximum colors that color brewer supports is 12
-          # If we have more than 12 countries, we need to make the dygraph manually:
-          . <- xts::xts(.[, -1], order.by = .$date)
-          dg <- dygraph(., xlab = "Date", ylab = "Users (%)", main = "Geographic breakdown of portal visitors")
-          dg <- dyOptions(dg, strokeWidth = 3, colors = colorspace::rainbow_hcl(ncol(temp)-1),
-                          drawPoints = FALSE, pointSize = 3, labelsKMB = TRUE, includeZero = TRUE)
-          dg
-        } else {
-          polloi::make_dygraph(., xlab = "Date", ylab = "Users (%)", title = "Geographic breakdown of portal visitors")
-        }
-      } %>%
+      polloi::make_dygraph(., xlab = "Date", ylab = "Users (%)", title = "Geographic breakdown of portal visitors") %>%
       dyLegend(labelsDiv = "country_breakdown_legend", show = "always", width = 400) %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyCSS(css = "www/inverse.css") %>%
@@ -360,10 +350,6 @@ shinyServer(function(input, output, session){
   
   lv_reactive <- reactiveValues(choices = NULL, selected_langs = NULL)
   
-  observeEvent(input$lv_selectall, {
-    lv_reactive$selected_langs <- lv_reactive$choices
-  })
-  
   observeEvent(input$lv_sort, {
     if (input$lv_sort %in% c("alphabet_az", "alphabet_za")) {
       lv_reactive$choices <- sort(unique(langs_visited$language), decreasing = input$lv_sort == "alphabet_za")
@@ -394,49 +380,63 @@ shinyServer(function(input, output, session){
                                         dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = TRUE), 10), ], desc(clicks))$language
                                       }
                                     },
-                                    bottom10 = {
+                                    bottom50 = {
                                       if (input$lv_response == "users") {
-                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 10), ], desc(users))$language
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(users))$language
                                       } else {
-                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 10), ], desc(clicks))$language
+                                        dplyr::arrange(languages[languages[[input$lv_response]] %in% head(sort(languages[[input$lv_response]], decreasing = FALSE), 50), ], desc(clicks))$language
                                       }
                                     })
     }
-    if (!is.null(input$lv_languages)) {
-      if (sum(input$lv_languages %in% lv_reactive$choices) == 0) {
-        if (input$lv_sort %in% c("top10", "bottom10")) {
-          lv_reactive$selected_langs <- lv_reactive$choices
-        } else {
-          lv_reactive$selected_langs <- lv_reactive$choices[1]
-        }
-      } else {
-        # Lets us keep selected languages when switching betweeen clicks and users
-        lv_reactive$selected_langs <- intersect(input$lv_languages, lv_reactive$choices)
-      }
+    if (input$lv_sort %in% c("top10", "bottom50")) {
+      lv_reactive$selected_langs <- lv_reactive$choices
     } else {
-      if (input$lv_sort %in% c("top10", "bottom10")) {
-        lv_reactive$selected_langs <- lv_reactive$choices
+      if (!is.null(input$lv_languages)) {
+        if (sum(input$lv_languages %in% lv_reactive$choices) == 0) {
+          lv_reactive$selected_langs <- lv_reactive$choices[1]
+        } else {
+          # Lets us keep selected languages when switching betweeen clicks and users
+          lv_reactive$selected_langs <- intersect(input$lv_languages, lv_reactive$choices)
+        }
       } else {
         lv_reactive$selected_langs <- lv_reactive$choices[1]
       }
     }
   })
   
-  output$lv_languages_container <- renderUI({
-    selectizeInput("lv_languages", "Wikipedia languages (12 max)", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12))
-  })
-  
   observeEvent(input$lv_languages, {
     lv_reactive$selected_langs <- input$lv_languages
+  })
+  
+  output$lv_languages_container <- renderUI({
+    if (input$lv_sort %in% c("top10", "bottom50")) {
+      hidden(disabled(selectizeInput("lv_languages", "Wikipedia languages", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE)))
+    } else {
+      selectizeInput("lv_languages", "Wikipedia languages (12 max)", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12))
+    }
+  })
+  
+  observeEvent(input$lv_sort, {
+    if (input$lv_sort %in% c("top10", "bottom50")) {
+      removeClass("lv_legend", "large"); addClass("lv_legend", "tiny")
+    } else {
+      removeClass("lv_legend", "tiny"); addClass("lv_legend", "large")
+    }
   })
   
   output$lv_dygraph <- renderDygraph({
     if (input$lv_response == "clicks") {
       if (length(input$lv_languages) > 1) {
         data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "clicks"), with = FALSE] %>%
-          tidyr::spread(language, clicks, fill = 0) %>%
+          {
+            if (input$lv_sort == "bottom50" && input$lv_bottom50_combine) {
+              dplyr::summarize(dplyr::group_by(., date), `total clicks` = sum(clicks))
+            } else {
+              tidyr::spread(., language, clicks, fill = 0)
+            }
+          } %>%
           fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
-          { .[, c("date", input$lv_languages)] }
+          { .[, union("date", names(.))] }
       } else {
         if (input$lv_type == "count") {
           data4dygraph <- langs_visited[langs_visited$language == input$lv_languages, c("date", "clicks", "search", "primary", "secondary"), with = FALSE] %>%
@@ -454,7 +454,7 @@ shinyServer(function(input, output, session){
       data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "sessions"), with = FALSE] %>%
         tidyr::spread(language, sessions, fill = 0) %>%
         fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
-        { .[, c("date", input$lv_languages)] }
+        { .[, union("date", names(.))] }
     }
     data4dygraph[is.na(data4dygraph)] <- 0
     data4dygraph %>%
@@ -464,7 +464,7 @@ shinyServer(function(input, output, session){
                  stop("Cannot apply spline smoothing on one or more of the selected languages.")
                }, finally = NULL)
     } %>%
-      polloi::make_dygraph(xlab = "Date", ylab = ifelse(input$lv_response == "clicks", ifelse(input$lv_type == "count", "Clicks", "Proportion of total clicks (%)"), "Unique sessions"),
+    polloi::make_dygraph(xlab = "Date", ylab = ifelse(input$lv_response == "clicks", ifelse(input$lv_type == "count", "Clicks", "Proportion of total clicks (%)"), "Unique sessions"),
                            title = paste0(ifelse(input$lv_response == "clicks", "Clicks", "Users who went"), " to ", paste0(input$lv_languages, collapse = ", ")," Wikipedia", ifelse(length(input$lv_languages) > 1, "s", ""), " from Portal")) %>%
       dyRangeSelector(fillColor = ifelse(input$lv_type == "prop", "", "gray"),
                       strokeColor = ifelse(input$lv_type == "prop", "", "white"),

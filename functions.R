@@ -135,17 +135,6 @@ fill_out <- function(x, start_date, end_date, fill = 0) {
   return(y)
 }
 
-smart_palette <- function(n_colors) {
-  if (n_colors <= 9) {
-    return(RColorBrewer::brewer.pal(max(3, n_colors), "Set1"))
-  }
-  else if (n_colors < 12) {
-    return(RColorBrewer::brewer.pal(n_colors, "Set3"))
-  } else {
-    return(colorspace::rainbow_hcl(n_colors))
-  }
-}
-
 # Fits an exponential model to the data and returns the rate of growth (or decay!)
 get_exp_rate <- function(dates, y) {
   time_frame <- range(dates)
