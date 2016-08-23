@@ -263,6 +263,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-01"), "A (search-redirect.php)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-09"), "B (unexplainable rise)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-06-22"), "C (pageview redefined)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   
