@@ -438,7 +438,13 @@ shinyServer(function(input, output, session) {
             }
           } %>%
           fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
-          { .[, union("date", names(.))] }
+          {
+            if (input$lv_sort == "bottom50" && input$lv_bottom50_combine) {
+              .[, union("date", names(.))]
+            } else {
+              .[, c("date", input$lv_languages)]
+            }
+          }
       } else {
         if (input$lv_type == "count") {
           data4dygraph <- langs_visited[langs_visited$language == input$lv_languages, c("date", "clicks", "search", "primary", "secondary"), with = FALSE] %>%
@@ -456,7 +462,13 @@ shinyServer(function(input, output, session) {
       data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "sessions"), with = FALSE] %>%
         tidyr::spread(language, sessions, fill = 0) %>%
         fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
-        { .[, union("date", names(.))] }
+        {
+          if (input$lv_sort == "bottom50" && input$lv_bottom50_combine) {
+            .[, union("date", names(.))]
+          } else {
+            .[, c("date", input$lv_languages)]
+          }
+        }
     }
     data4dygraph[is.na(data4dygraph)] <- 0
     data4dygraph %>%
