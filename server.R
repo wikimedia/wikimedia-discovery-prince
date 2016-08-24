@@ -419,11 +419,11 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$lv_sort, {
-    if (input$lv_sort %in% c("top10", "bottom50")) {
-      removeClass("lv_legend", "large"); addClass("lv_legend", "tiny")
-    } else {
-      removeClass("lv_legend", "tiny"); addClass("lv_legend", "large")
-    }
+    
+    # Make legend small in case of Top 10 or Bottom 50, otherwise make it big:
+    toggleClass("lv_legend", "small", input$lv_sort %in% c("top10", "bottom50"))
+    toggleClass("lv_legend", "large", !input$lv_sort %in% c("top10", "bottom50"))
+    
   })
   
   output$lv_dygraph <- renderDygraph({

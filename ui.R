@@ -191,7 +191,7 @@ body <- dashboardBody(
           width = 2)
       ),
       dygraphOutput("lv_dygraph"),
-      div(id = "lv_legend", class = "large", style = "text-align: center; padding: 0 10px;"),
+      div(id = "lv_legend", class = "large", style = "text-align: center; padding: 15px 10px 0 10px;"),
       includeMarkdown("tab_documentation/languages_visited.md")
     )
   )

@@ -12,7 +12,7 @@ When looking at clicks, you can view counts or proportions to see how much of th
 
 **Note**: Sister project link clickthroughs are not tracked on this page, see [this page](http://discovery.wmflabs.org/portal/#most_common) for more info.
 
-Viewing count/proportional breakdown of clicks is only available when a single language is selected. When multiple languages are selected, only the total number of clicks of the three sections is shown for each language.
+Viewing count/proportional breakdown of clicks is only available when a single language is selected. When multiple languages are selected, only the total number of clicks of the three sections is shown for each language. When multiple languages are selected (e.g. Top 10 or Bottom 50), the order they appear in inside the legend corresponds to the total number of clicks (or users), from highest to lowest. If several languages have the same number of historical clicks/users, they are then sorted further alphabetically by name.
 
 By far, the English Wikipedia is the most visited one. Majority of the traffic to EnWiki is from Portal visitors searching (consistently >50% and as high as 70%), while *primary link* clicks account for 30-40% of the traffic to EnWiki from the Portal.
 
