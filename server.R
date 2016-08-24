@@ -424,6 +424,12 @@ shinyServer(function(input, output, session) {
     toggleClass("lv_legend", "small", input$lv_sort %in% c("top10", "bottom50"))
     toggleClass("lv_legend", "large", !input$lv_sort %in% c("top10", "bottom50"))
     
+    if (input$lv_sort == "bottom50") {
+      updateCheckboxInput(session, "lv_combine", value = TRUE)
+    } else {
+      updateCheckboxInput(session, "lv_combine", value = FALSE)
+    }
+    
   })
   
   output$lv_dygraph <- renderDygraph({
@@ -431,7 +437,7 @@ shinyServer(function(input, output, session) {
       if (length(input$lv_languages) > 1) {
         data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "clicks"), with = FALSE] %>%
           {
-            if (input$lv_sort == "bottom50" && input$lv_bottom50_combine) {
+            if (input$lv_sort != "top10" && input$lv_combine && length(input$lv_languages) > 1) {
               dplyr::summarize(dplyr::group_by(., date), `total clicks` = sum(clicks))
             } else {
               tidyr::spread(., language, clicks, fill = 0)
@@ -439,7 +445,7 @@ shinyServer(function(input, output, session) {
           } %>%
           fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
           {
-            if (input$lv_sort == "bottom50" && input$lv_bottom50_combine) {
+            if (input$lv_sort != "top10" && input$lv_combine && length(input$lv_languages) > 1) {
               .[, union("date", names(.))]
             } else {
               .[, c("date", input$lv_languages)]
@@ -463,11 +469,7 @@ shinyServer(function(input, output, session) {
         tidyr::spread(language, sessions, fill = 0) %>%
         fill_out(start_date = min(langs_visited$date), end_date = max(langs_visited$date)) %>%
         {
-          if (input$lv_sort == "bottom50" && input$lv_bottom50_combine) {
-            .[, union("date", names(.))]
-          } else {
-            .[, c("date", input$lv_languages)]
-          }
+          .[, c("date", input$lv_languages)]
         }
     }
     data4dygraph[is.na(data4dygraph)] <- 0

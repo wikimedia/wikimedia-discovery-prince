@@ -183,9 +183,9 @@ body <- dashboardBody(
                    div(icon("question-circle", class = "fa-lg"),
                        title = "Type to find a language. Use backspace key to remove a selected language.",
                        style="width: 12.5%; margin-left: 2.5%; padding-top: 30px; height: 34px; display: inline-block; float: left;"),
-          conditionalPanel("input.lv_sort === 'bottom50' & input.lv_response === 'clicks'", HTML("<label class = \"control-label\" style = \"margin-bottom:-30px;\">Aggregation</label>"), checkboxInput("lv_bottom50_combine", "Combine languages", FALSE)),
           width = 3),
         column(
+          conditionalPanel("input.lv_response === 'clicks' & input.lv_languages.length > 1 & input.lv_sort != 'top10'", HTML("<label class = \"control-label\" style = \"margin-bottom:-30px;\">Aggregation</label>"), checkboxInput("lv_combine", "Combine languages", FALSE)),
           conditionalPanel("input.lv_response === 'clicks' & input.lv_languages.length < 2", radioButtons("lv_type", "Type", list("Counts" = "count", "Proportions" = "prop"), inline = TRUE)),
           conditionalPanel("input.lv_type === 'count'", HTML("<label class = \"control-label\" style = \"margin-bottom:-30px;\">Scale</label>"), checkboxInput("lv_logscale", "Use Log scale", FALSE)),
           width = 2)
