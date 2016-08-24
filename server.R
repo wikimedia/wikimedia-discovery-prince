@@ -485,7 +485,7 @@ shinyServer(function(input, output, session) {
                       retainDateWindow = TRUE) %>%
       dyOptions(strokeWidth = 3, labelsKMB = TRUE, drawPoints = FALSE, pointSize = 3, includeZero = TRUE,
                 logscale = input$lv_logscale && input$lv_type == "count") %>%
-      dyLegend(width = 400, labelsDiv = "lv_legend", show = "always") %>%
+      dyLegend(width = 400, labelsDiv = "lv_legend", show = "always", showZeroValues = FALSE) %>%
       dyCSS(css = "www/inverse.css") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
