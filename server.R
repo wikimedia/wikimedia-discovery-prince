@@ -342,9 +342,11 @@ shinyServer(function(input, output, session) {
     dyout %>%
       dyOptions(strokeWidth = 3, labelsKMB = TRUE, drawPoints = FALSE, pointSize = 3, includeZero = TRUE,
                 logscale = input$s_response == "clicks" && input$s_type == "count" && input$s_logscale) %>%
-      dyLegend(width = 400, labelsDiv = "s_legend", show = "always") %>%
+      dyLegend(width = 400, labelsDiv = "s_legend", show = "always", showZeroValues = FALSE) %>%
       dyCSS(css = "www/inverse.css") %>%
+      dyEvent(as.Date("2015-11-16"), "A1 (Started EL)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-10"), "A2 (Unfiltered Counts)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
@@ -489,7 +491,9 @@ shinyServer(function(input, output, session) {
                 logscale = input$lv_logscale && input$lv_type == "count") %>%
       dyLegend(width = 400, labelsDiv = "lv_legend", show = "always", showZeroValues = FALSE) %>%
       dyCSS(css = "www/inverse.css") %>%
+      dyEvent(as.Date("2015-11-16"), "A1 (Started EL)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-05-10"), "A2 (Unfiltered Counts)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")

@@ -12,6 +12,12 @@ When looking at clicks, you can view counts or proportions to see how much of th
 
 Until 27 June 2016, traffic to Wikipedias was almost evenly split between people searching and people using the primary links. Since then, search has been the more dominant section. However, this is due to a rise in Portal visitors searching EnWiki from the Portal. If we exclude EnWiki from the total, we see that clicks on primary links consistently account for 50-60% of the traffic to Wikipedias in languages other than English, searches account for ~35% of the traffic, and clicks on secondary links account for ~8% of the traffic.
 
+## Outages and notes
+
+- **A**: Languages visited data backfilled
+    1. The data we used for a retrospective study of Portal deployments started on 16 November 2016, although there were filters applied to the data used in the analysis. Specifically, known spiders were excluded and only data from the first 10 visits per session was kept for data storage space reasons.
+    2. When we began work on this part of the dashboard, we could only backfill data from 2016-05-10 due to the 90-day restriction our event logging system has. Therefore, we had to use the previously saved (slightly filtered) data to backfill visited language counts from November 16th to May 9th. We checked how the filtered data (post May 10th) compared to the unfiltered data and some counts were off by 1-8 clicks, hence why we are noting the difference here.
+
 ## Questions, bug reports, and feature suggestions
 
 For technical, non-bug questions, [email Mikhail](mailto:mpopov@wikimedia.org?subject=Dashboard%20Question). If you experience a bug or notice something wrong or have a suggestion, [open a ticket in Phabricator](https://phabricator.wikimedia.org/maniphest/task/create/?projects=Discovery) in the Discovery board or [email Deb](mailto:deb@wikimedia.org?subject=Dashboard%20Question).
