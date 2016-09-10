@@ -1,4 +1,4 @@
-Pageviews to the portal
+Pageviews (PVs) to Wikipedia.org Portal
 =======
 
 This looks at, without sampling, the number of pageviews the Wikipedia Portal gets per day. This is expressed as raw values. See [our Hive query](https://github.com/wikimedia/wikimedia-discovery-golden/blob/master/portal/pageviews.R#L9) for the technical definition of a Wikipedia.org pageview.
@@ -8,6 +8,7 @@ Notes
 - **A**: Started filtering out search-redirect.php requests. See [T138411](https://phabricator.wikimedia.org/T138411) for more information.
 - **B**: Rise could not be determined due to deleted data. See [write-up](https://github.com/wikimedia-research/Discovery-Research-Portal/blob/master/Analyses/Pageviews%20Rise/README.md) and [T143045](https://phabricator.wikimedia.org/T143045) for more information.
 - **C**: The investigation of pageviews rise caused us to [redefine](https://gerrit.wikimedia.org/r/#/c/306261/) how we count wikipedia.org pageviews. Pageviews from 2016-06-22 to 2016-08-22 were then recounted using the new definition. See [T143064](https://phabricator.wikimedia.org/T143064) for more information.
+- **D**: On 11 July 2016 we started to split pageview counts into pageviews from "low-volume" clients and "high-volume" clients. A "high-volume" client is a client whose wikipedia.org pageviews are equal to or greater than the 99.99th percentile for the whole population on any particular day. The rationale for this being that the low-volume clients' PV counts would be more stable and the high-volume clients' PV counts would soak up outliers and bots. See [T143605](https://phabricator.wikimedia.org/T143605) for more details.
 
 Questions, bug reports, and feature suggestions
 ------

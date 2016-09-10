@@ -265,6 +265,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-09"), "B (unexplainable rise)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-22"), "C (pageview redefined)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2016-07-11"), "D (split-pageviews)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
   

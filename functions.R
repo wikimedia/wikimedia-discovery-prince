@@ -83,7 +83,8 @@ read_useragents <- function(){
 }
 
 read_pageviews <- function(){
-  pageview_data <<- polloi::read_dataset(path = "portal/portal_pageviews.tsv")
+  pageview_data <<- polloi::read_dataset(path = "portal/portal_pageviews.tsv", col_types = "Diii-") %>%
+    set_names(c("date", "total pageviews", "high-volume clients' PVs", "low-volume clients' PVs"))
 }
 
 read_referrals <- function(){
