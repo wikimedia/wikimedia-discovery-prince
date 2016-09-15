@@ -7,27 +7,27 @@ source("extras.R")
 
 # Read in the traffic data
 read_clickthrough <- function(){
-  
+
   # Read in and format the high-level data
   data <- as.data.table(polloi::read_dataset(path = "portal/clickthrough_rate.tsv"))
-  clickthrough_rate <<- data[, j = list(success_rate = (events[type == "clickthrough"]/sum(events))*100), by = "date"]
-  
+  clickthrough_rate <<- data[, j = list(`clickthrough rate` = (events[type == "clickthrough"]/sum(events))*100), by = "date"]
+
   # Read in and format the breakdown data
   data <- as.data.table(polloi::read_dataset(path = "portal/clickthrough_breakdown.tsv"))
   data <- data[, j = list(section_used = section_used, proportion = (events/sum(events))*100), by = "date"]
   action_breakdown <<- reshape2::dcast(data, formula = date ~ section_used, fun.aggregate = sum)
-  
+
   # Read in most common section per visit data
   data <- as.data.table(polloi::read_dataset(path = "portal/most_common_per_visit.tsv"))
   data <- data[, j = list(section_used = section_used, proportion = (visits/sum(visits))*100), by = "date"]
   most_common <<- reshape2::dcast(data, formula = date ~ section_used, fun.aggregate = sum)
-  
+
   # Read in first visit clickthrough rates
   data <- polloi::read_dataset(path = "portal/clickthrough_firstvisit.tsv")
   data[, -1] <- data[, -1]*100 # first column is always going to be the date
   data$`language search` <- 0
   first_visit_ctrs <<- as.data.frame(data[, names(action_breakdown)])
-  
+
   return(invisible())
 }
 
@@ -42,7 +42,7 @@ read_dwelltime <- function(){
 
 read_country <- function(){
   data <- as.data.table(polloi::read_dataset(path = "portal/country_data.tsv"))
-  
+
   country_data <<- reshape2::dcast(data[,list(country = country, events = round(events/sum(events)*100,2)),
                                         by = "date"],
                                    formula = date ~ country, fun.aggregate = sum)
@@ -88,15 +88,15 @@ read_pageviews <- function(){
 }
 
 read_referrals <- function(){
-  
+
   # Read in the initial data
   data <- as.data.table(polloi::read_dataset(path = "portal/portal_referer_data.tsv"))
-  
+
   # Format
   data$is_search <- ifelse(data$is_search, "Referred by search", "Not referred by search")
   data$search_engine[data$search_engine == "none"] <- "Not referred by search"
-  
-  
+
+
   # Write out the overall values for traffic
   interim <- data[, j = list(pageviews = sum(pageviews)),
                     by = c("date", "referer_class")] %>%
@@ -117,16 +117,16 @@ read_referrals <- function(){
                       "Unknown referers",
                       "Total")
   summary_traffic_data <<- interim[, 1:7]
-  
+
   # Generate per-engine values
   interim <- data[data$search_engine != "Not referred by search",
                   j = list(pageviews = sum(pageviews)),
                   by = c("date", "search_engine")] %>%
     reshape2::dcast(formula = date ~ search_engine, fun.aggregate = sum)
   bysearch_traffic_data <<- cbind(date = interim$date, data.frame(round(100*t(apply(interim[, -1], 1, function(x) { x/sum(x) })), 2)))
-  
+
   return(invisible())
-  
+
 }
 
 fill_out <- function(x, start_date, end_date, fill = 0) {

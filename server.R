@@ -1,16 +1,14 @@
 library(shiny)
 library(shinydashboard)
 library(dygraphs)
-library(shinyURL)
 library(shinyjs)
 
 source("functions.R")
-options(scipen = 500)
 
 existing_date <- Sys.Date() - 1
 
 shinyServer(function(input, output, session) {
-  
+
   if (Sys.Date() != existing_date) {
     progress <- shiny::Progress$new(session, min = 0, max = 1)
     on.exit(progress$close())
@@ -31,14 +29,12 @@ shinyServer(function(input, output, session) {
     progress$set(message = "Finished downloading datasets.", value = 1)
     existing_date <<- Sys.Date()
   }
-  
-  shinyURL.server(session)
-  
+
   output$clickthrough_rate_dygraph <- renderDygraph({
     clickthrough_rate %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_clickthrough_rate)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "Clickthrough rate (%)",
-                           title = "Wikipedia portal clickthrough rate") %>%
+                           title = "Wikipedia.org Portal Clickthrough Rate") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyLegend(labelsDiv = "clickthrough_rate_legend", show = "always") %>%
@@ -49,7 +45,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$action_breakdown_dygraph <- renderDygraph({
     action_breakdown %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_action_breakdown)) %>%
@@ -65,7 +61,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$most_common_dygraph <- renderDygraph({
     most_common %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_most_common)) %>%
@@ -79,7 +75,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$first_visit_dygraph <- renderDygraph({
     first_visit_ctrs %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_first_visit)) %>%
@@ -94,7 +90,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$dwelltime_dygraph <- renderDygraph({
     dwelltime_data %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_dwelltime)) %>%
@@ -109,7 +105,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$country_breakdown_dygraph <- renderDygraph({
     if (input$group_us_regions) {
       temp <- country_data
@@ -142,7 +138,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-28"), "A (regional U.S.)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$browser_selector_container <- renderUI({
     browsers <- switch(input$browser_order,
                        "alphabet" = {
@@ -219,7 +215,7 @@ shinyServer(function(input, output, session) {
     return(selectInput("browser_selector", "Browser", selected = selected, choices = browsers,
                        multiple = TRUE, selectize = FALSE, size = 15))
   })
-  
+
   output$browser_breakdown_dygraph <- renderDygraph({
     if (input$group_browsers) {
       if (input$browser_grouping == "family") {
@@ -250,7 +246,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$pageview_dygraph <- renderDygraph({
     pageview_data %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_pageviews)) %>%
@@ -268,7 +264,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-07-11"), "D (split-pageviews)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   output$referer_summary_dygraph <- renderDygraph({
     summary_traffic_data %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_referer_summary)) %>%
@@ -282,7 +278,7 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-03-07"), "A (UDF switch)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-01"), "B (search-redirect.php)", labelLoc = "bottom", color = "white")
   })
-  
+
   output$search_engines_dygraph <- renderDygraph({
     bysearch_traffic_data %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_search_engines)) %>%
@@ -294,15 +290,15 @@ shinyServer(function(input, output, session) {
       dyLegend(labelsDiv = "search_engines_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE)
   })
-  
+
   output$s_dygraph <- renderDygraph({
-    
+
     if (!input$s_enwiki) {
       idx <- langs_visited$prefix != "en"
     } else {
       idx <- TRUE
     }
-    
+
     if (input$s_response == "clicks") {
       if (input$s_type == "count") {
         data4dygraph <- langs_visited[idx,
@@ -353,9 +349,9 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
   lv_reactive <- reactiveValues(choices = NULL, selected_langs = NULL)
-  
+
   observeEvent(input$lv_sort, {
     if (input$lv_sort %in% c("alphabet_az", "alphabet_za")) {
       lv_reactive$choices <- sort(unique(langs_visited$language), decreasing = input$lv_sort == "alphabet_za")
@@ -409,11 +405,11 @@ shinyServer(function(input, output, session) {
       }
     }
   })
-  
+
   observeEvent(input$lv_languages, {
     lv_reactive$selected_langs <- input$lv_languages
   })
-  
+
   output$lv_languages_container <- renderUI({
     if (input$lv_sort %in% c("top10", "bottom50")) {
       hidden(disabled(selectizeInput("lv_languages", "Wikipedia languages", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE)))
@@ -421,21 +417,21 @@ shinyServer(function(input, output, session) {
       selectizeInput("lv_languages", "Wikipedia languages (12 max)", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12))
     }
   })
-  
+
   observeEvent(input$lv_sort, {
-    
+
     # Make legend small in case of Top 10 or Bottom 50, otherwise make it big:
     toggleClass("lv_legend", "small", input$lv_sort %in% c("top10", "bottom50"))
     toggleClass("lv_legend", "large", !input$lv_sort %in% c("top10", "bottom50"))
-    
+
     if (input$lv_sort == "bottom50") {
       updateCheckboxInput(session, "lv_combine", value = TRUE)
     } else {
       updateCheckboxInput(session, "lv_combine", value = FALSE)
     }
-    
+
   })
-  
+
   output$lv_dygraph <- renderDygraph({
     if (input$lv_response == "clicks") {
       if (length(input$lv_languages) > 1) {
@@ -501,5 +497,5 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
   })
-  
+
 })
