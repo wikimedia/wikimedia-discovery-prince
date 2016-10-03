@@ -22,8 +22,14 @@ Notes
         - Mountain Division: Arizona, Colorado, Idaho, Montana, Nevada, New Mexico, Utah and Wyoming
     - **Pacific Region**
         - Alaska, California, Hawaii, Oregon and Washington
+* __B__ (13 September 2016): Added event logging of language-switching, causing some events to flow into old table and some events to flow into the new table. See [T143149](https://phabricator.wikimedia.org/T143149) for more details.
 
 See [T136257](https://phabricator.wikimedia.org/T136257) for more details.
+
+Outages and inaccuracies
+------
+
+- **A** (13 September 2016): Added event logging of language-switching, causing some events to flow into old table and some events to flow into the new table. See [T143149](https://phabricator.wikimedia.org/T143149) for more details.
 
 Questions, bug reports, and feature suggestions
 ------

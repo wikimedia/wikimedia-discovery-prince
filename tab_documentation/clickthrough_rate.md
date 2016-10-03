@@ -13,8 +13,8 @@ Specifically, the clickthrough rate presented here is the overall rate without a
 Outages and inaccuracies
 ------
 
-* From 7 December (marked "A") the sampling changed to exclude a broader range of browsers, resulting in alterations to things
-like clickthrough rate and dwell time. We expect this to resolve itself on 4 January when a new schema version is launched.
+- From 7 December (marked "A") the sampling changed to exclude a broader range of browsers, resulting in alterations to things like clickthrough rate and dwell time. We expect this to resolve itself on 4 January when a new schema version is launched.
+- **B** (13 September 2016): Added event logging of language-switching, causing some events to flow into old table and some events to flow into the new table. See [T143149](https://phabricator.wikimedia.org/T143149) for more details.
 
 Broadly-speaking, it's worth noting that (as with all data based on JavaScript logging) the code that gathers this information requires a certain amount of browser capabilities to function. It's probably not going to work on 10 year old Nokia brick phones, and so the data will be biased against users using those kinds of devices.
 

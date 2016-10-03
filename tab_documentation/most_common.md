@@ -12,6 +12,11 @@ In [the clickthroughs tab](http://discovery.wmflabs.org/portal/#clickthrough_rat
 
 The values are expressed as percentages - so if a feature has the value "61.3" it is being used 61.3% of the time.
 
+Outages and notes
+-------
+
+- **A** (13 September 2016): Added event logging of language-switching, causing some events to flow into old table and some events to flow into the new table. See [T143149](https://phabricator.wikimedia.org/T143149) for more details.
+
 Questions, bug reports, and feature suggestions
 ------
 For technical, non-bug questions, [email Mikhail](mailto:mpopov@wikimedia.org?subject=Dashboard%20Question). If you experience a bug or notice something wrong or have a suggestion, [open a ticket in Phabricator](https://phabricator.wikimedia.org/maniphest/task/create/?projects=Discovery) in the Discovery board or [email Deb](mailto:deb@wikimedia.org?subject=Dashboard%20Question).
