@@ -57,7 +57,7 @@ a {
   width: 90%;
 }
 
-#lv_dygraph .dygraph-title {
+#lv_dygraph .dygraph-title, #all_country_dygraph .dygraph-title, #first_visit_country_dygraph .dygraph-title, #last_action_dygraph .dygraph-title, #most_common_country_dygraph .dygraph-title {
   font-weight: normal;
   font-size: x-small;
 }
@@ -69,3 +69,122 @@ a {
 .small {
   font-size: small;
 }
+
+/*Inverse DataTables*/
+
+input[type="search"], textarea {
+    background-color : #222d32;
+}
+select, button {
+    background-color : #222d32;
+}
+
+#all_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #ECF0F5 !important;
+}
+
+#all_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current, #all_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current, #first_visits_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current, #last_action_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current, #most_common_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #ecf0f5 !important;
+    border: 1px solid black;
+    background-color: #5c7987;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #5c7987), color-stop(100%, #222d32));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -moz-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* FF3.6+ */
+    background: -ms-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* IE10+ */
+    background: -o-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* Opera 11.10+ */
+    background: linear-gradient(to bottom, #5c7987 0%, #222d32 100%);
+/* W3C */ }
+
+#all_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: white !important;
+    border: 1px solid #222d32;
+    background-color: #5c7987;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #5c7987), color-stop(100%, #222d32));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -moz-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* FF3.6+ */
+    background: -ms-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* IE10+ */
+    background: -o-linear-gradient(top, #5c7987 0%, #222d32 100%);
+    /* Opera 11.10+ */
+    background: linear-gradient(to bottom, #5c7987 0%, #222d32 100%);
+/* W3C */ }
+
+#all_country_tbl .dataTables_wrapper .dataTables_length,
+#all_country_tbl .dataTables_wrapper .dataTables_filter,
+#all_country_tbl .dataTables_wrapper .dataTables_info,
+#all_country_tbl .dataTables_wrapper .dataTables_processing,
+#all_country_tbl .dataTables_wrapper .dataTables_paginate,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_length,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_filter,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_info,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_processing,
+#first_visits_by_country_tbl .dataTables_wrapper .dataTables_paginate,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_length,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_filter,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_info,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_processing,
+#last_action_by_country_tbl .dataTables_wrapper .dataTables_paginate,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_length,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_filter,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_info,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_processing,
+#most_common_by_country_tbl .dataTables_wrapper .dataTables_paginate {
+    color: #ecf0f5;
+}
+
+#all_country_tbl .dataTable tbody tr,
+#first_visits_by_country_tbl .dataTable tbody tr,
+#last_action_by_country_tbl .dataTable tbody tr,
+#most_common_by_country_tbl .dataTable tbody tr {
+    background-color: #222d32; }
+#all_country_tbl .dataTable thead th,
+#all_country_tbl .dataTable thead td,
+#first_visits_by_country_tbl .dataTable thead th,
+#first_visits_by_country_tbl .dataTable thead td,
+#last_action_by_country_tbl .dataTable thead th,
+#last_action_by_country_tbl .dataTable thead td,
+#most_common_by_country_tbl .dataTable thead th,
+#most_common_by_country_tbl .dataTable thead td {
+    border-bottom: 1px solid #dddddd; }
+#all_country_tbl .dataTable tfoot th,
+#all_country_tbl .dataTable tfoot td,
+#first_visits_by_country_tbl .dataTable tfoot th,
+#first_visits_by_country_tbl .dataTable tfoot td,
+#last_action_by_country_tbl .dataTable tfoot th,
+#last_action_by_country_tbl .dataTable tfoot td,
+#most_common_by_country_tbl .dataTable tfoot th,
+#most_common_by_country_tbl .dataTable tfoot td {
+    border-top: 1px solid #dddddd; }
+#all_country_tbl .dataTable.no-footer,
+#first_visits_by_country_tbl .dataTable.no-footer,
+#last_action_by_country_tbl .dataTable.no-footer,
+#most_common_by_country_tbl .dataTable.no-footer {
+    border-bottom: 1px solid #dddddd; }
+#all_country_tbl .dataTables_wrapper.no-footer .dataTables_scrollBody,
+#first_visits_by_country_tbl .dataTables_wrapper.no-footer .dataTables_scrollBody,
+#last_action_by_country_tbl .dataTables_wrapper.no-footer .dataTables_scrollBody,
+#most_common_by_country_tbl .dataTables_wrapper.no-footer .dataTables_scrollBody {
+    border-bottom: 1px solid #dddddd; }
+#all_country_tbl .dataTables_wrapper.no-footer,
+#first_visits_by_country_tbl .dataTables_wrapper.no-footer,
+#last_action_by_country_tbl .dataTables_wrapper.no-footer,
+#most_common_by_country_tbl .dataTables_wrapper.no-footer {
+    padding-left: 20px;
+    padding-right: 20px; }
