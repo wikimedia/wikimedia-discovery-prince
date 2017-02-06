@@ -4,7 +4,7 @@ library(dygraphs)
 library(shinyjs)
 library(highcharter)
 
-source("functions.R")
+source("utils.R")
 
 existing_date <- Sys.Date() - 1
 
@@ -15,19 +15,23 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = "Downloading clickthrough data...", value = 0)
     read_clickthrough()
-    progress$set(message = "Downloading language visit data...", value = 1/8)
+    progress$set(message = "Downloading language visit data...", value = 1/10)
     read_langs()
-    progress$set(message = "Downloading dwell-time data...", value = 2/8)
+    progress$set(message = "Downloading dwell-time data...", value = 2/10)
     read_dwelltime()
-    progress$set(message = "Downloading country data data...", value = 3/8)
+    progress$set(message = "Downloading country data data...", value = 3/10)
     read_country()
-    progress$set(message = "Downloading user-agent data...", value = 4/8)
+    progress$set(message = "Downloading user-agent data...", value = 4/10)
     read_useragents()
-    progress$set(message = "Downloading pageview data...", value = 5/8)
+    progress$set(message = "Downloading pageview data...", value = 5/10)
     read_pageviews()
-    progress$set(message = "Downloading referral data...", value = 6/8)
+    progress$set(message = "Downloading referral data...", value = 6/10)
     read_referrals()
-    progress$set(message = "Downloading geographical breakdown data...", value = 7/8)
+    progress$set(message = "Downloading sister project click data...", value = 7/10)
+    read_sisproj()
+    progress$set(message = "Downloading app link click data...", value = 8/10)
+    read_applinks()
+    progress$set(message = "Downloading geographical breakdown data...", value = 9/10)
     read_geo()
     progress$set(message = "Finished downloading datasets.", value = 1)
     existing_date <<- Sys.Date()
@@ -112,6 +116,79 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white")
+  })
+
+  output$sisproj_dygraph <- renderDygraph({
+    temp <- dplyr::select_(sisproj_clicks, .dots = list(quote(date), quote(destination), value = tolower(input$sisproj_metric)))
+    if (input$sisproj_type == "prop") {
+      temp <- temp %>%
+        dplyr::group_by(date) %>%
+        dplyr::mutate(value = 100*round(value/sum(value), 4)) %>%
+        dplyr::ungroup()
+    }
+    latest_values <- temp %>%
+      tidyr::spread(destination, value, fill = 0) %>%
+      polloi::safe_tail(1) %>%
+      dplyr::select(-date) %>%
+      unlist(use.names = TRUE)
+    dy <- temp %>%
+      tidyr::spread(destination, value, fill = 0) %>%
+      { .[, c("date", names(latest_values)[order(latest_values, decreasing = TRUE)])] } %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_sisproj), rename = FALSE) %>%
+      polloi::make_dygraph("Date", ifelse(input$sisproj_type == "prop", "Proportion (%)", input$sisproj_metric),
+                           paste(ifelse(input$sisproj_metric == "Clicks", "Clicks", "Users who clicked"), "on links other Wikimedia Foundation projects")) %>%
+      dyLegend(labelsDiv = "sisproj_legend", show = "always", width = 600)
+    return(dy)
+  })
+
+  output$applinks_dygraph <- renderDygraph({
+    if (input$applinks_destination_split && input$applinks_platform_split) {
+      if (length(input$applinks_destination) == 0 || length(input$applinks_platform) == 0) {
+        return(NULL)
+      }
+      temp <- applink_clicks %>%
+        dplyr::filter(clicked %in% input$applinks_destination, device %in% input$applinks_platform) %>%
+        dplyr::mutate(group = paste("Clicked on the ", clicked, "on a", dplyr::if_else(device == "Mobile", "mobile device", "desktop"))) %>%
+        dplyr::group_by(date, group) %>%
+        dplyr::summarize(clicks = sum(clicks))
+    } else if (input$applinks_destination_split && !input$applinks_platform_split) {
+      if (length(input$applinks_destination) == 0) {
+        return(NULL)
+      }
+      temp <- applink_clicks %>%
+        dplyr::filter(clicked %in% input$applinks_destination) %>%
+        dplyr::mutate(group = paste("Clicked on the ", clicked)) %>%
+        dplyr::group_by(date, group) %>%
+        dplyr::summarize(clicks = sum(clicks))
+    } else if (!input$applinks_destination_split && input$applinks_platform_split) {
+      if (length(input$applinks_platform) == 0) {
+        return(NULL)
+      }
+      temp <- applink_clicks %>%
+        dplyr::filter(device %in% input$applinks_platform) %>%
+        dplyr::mutate(group = paste("Clicked on the links from a", dplyr::if_else(device == "Mobile", "mobile device", "desktop"))) %>%
+        dplyr::group_by(date, group) %>%
+        dplyr::summarize(clicks = sum(clicks))
+    } else {
+      temp <- applink_clicks %>%
+        dplyr::group_by(date) %>%
+        dplyr::summarize(group = "Clicks", clicks = sum(clicks))
+    }
+    if (input$applinks_type == "prop") {
+      temp <- temp %>%
+        dplyr::group_by(date) %>%
+        dplyr::mutate(total = sum(clicks)) %>%
+        dplyr::group_by(date, group) %>%
+        dplyr::mutate(clicks = 100*round(clicks/total, 4)) %>%
+        dplyr::select(-total)
+    }
+    dy <- temp %>%
+      dplyr::ungroup() %>%
+      tidyr::spread(group, clicks, fill = 0) %>%
+      polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_applinks), rename = FALSE) %>%
+      polloi::make_dygraph("Date", ifelse(input$applinks_type == "prop", "Proportion (%)", "Clicks"), "Clicks on Wikipedia mobile app links") %>%
+      dyLegend(labelsDiv = "applinks_legend", show = "always", width = 600)
+    return(dy)
   })
 
   output$country_breakdown_dygraph <- renderDygraph({
@@ -450,7 +527,7 @@ shinyServer(function(input, output, session) {
         data4dygraph <- langs_visited[langs_visited$language %in% input$lv_languages, c("date", "language", "clicks"), with = FALSE] %>%
           {
             if (input$lv_sort != "top10" && input$lv_combine && length(input$lv_languages) > 1) {
-              dplyr::summarize(dplyr::group_by(., date), `total clicks` = sum(clicks))
+              dplyr::summarize(group_by(., date), `total clicks` = sum(clicks))
             } else {
               tidyr::spread(., language, clicks, fill = 0)
             }
@@ -518,13 +595,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_a %in% c("us_a", "custom_a")){
       fnl_tbl <- all_country_data %>%
         rbind(us_data) %>%
-        filter(Date >= input$date_all_country[1]
+        dplyr::filter(Date >= input$date_all_country[1]
                & Date <= input$date_all_country[2]
                & Country %in% selected_country_a()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- all_country_data %>%
-        filter(Date >= input$date_all_country[1]
+        dplyr::filter(Date >= input$date_all_country[1]
                & Date <= input$date_all_country[2]
                & Country %in% selected_country_a())
     }
@@ -534,13 +611,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_a %in% c("us_a", "custom_a")){
       fnl_tbl <- all_country_data_prop %>%
         rbind(us_data_prop) %>%
-        filter(Date >= input$date_all_country[1]
+        dplyr::filter(Date >= input$date_all_country[1]
                & Date <= input$date_all_country[2]
                & Country %in% selected_country_a()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- all_country_data_prop %>%
-        filter(Date >= input$date_all_country[1]
+        dplyr::filter(Date >= input$date_all_country[1]
                & Date <= input$date_all_country[2]
                & Country %in% selected_country_a())
     }
@@ -558,14 +635,14 @@ shinyServer(function(input, output, session) {
   })
   selected_country_a <- reactive({
     all_country_temp<- all_country_data %>%
-      filter(all_country_data$Date >= input$date_all_country[1]
+      dplyr::filter(all_country_data$Date >= input$date_all_country[1]
              & all_country_data$Date <= input$date_all_country[2]) %>%
-      select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
-      group_by(Country) %>%
-      summarize_(.dots =
+      dplyr::select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(.dots =
                    if(input$traffic_select %in% c('events','visits','sessions')) as.formula(paste0("~ sum(`",cntr_reactive$selected_metric_a,"`)")) else as.formula(paste0("~ median(`",cntr_reactive$selected_metric_a,"`)"))
       ) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       as.data.frame()
     all_country_temp <- all_country_temp[order(all_country_temp[,2], all_country_temp[,1]),]
     result <- switch(input$cntr_sort_a,
@@ -591,33 +668,33 @@ shinyServer(function(input, output, session) {
     if (input$cntr_combine_a == T){
       if (input$traffic_select == 'ctr_all'){
         data4dygraph <- all_country_data_dt() %>%
-          mutate(clicks=`Number of Events`*`Overall Clickthrough Rate`) %>%
-          group_by(Date) %>%
-          summarize("Overall Clickthrough Rate"=sum(clicks)/sum(`Number of Events`)) %>%
-          rename(date=Date) %>%
+          dplyr::mutate(clicks=`Number of Events`*`Overall Clickthrough Rate`) %>%
+          dplyr::group_by(Date) %>%
+          dplyr::summarize("Overall Clickthrough Rate"=sum(clicks)/sum(`Number of Events`)) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_all_country[1], end_date = input$date_all_country[2])
       } else if (input$traffic_select == 'ctr_vst'){
         data4dygraph <- all_country_data_dt() %>%
-          mutate(clicks=`Number of Visits`*`Clickthrough Rate Per Visit`) %>%
-          group_by(Date) %>%
-          summarize("Clickthrough Rate Per Visit"=sum(clicks)/sum(`Number of Visits`)) %>%
-          rename(date=Date) %>%
+          dplyr::mutate(clicks=`Number of Visits`*`Clickthrough Rate Per Visit`) %>%
+          dplyr::group_by(Date) %>%
+          dplyr::summarize("Clickthrough Rate Per Visit"=sum(clicks)/sum(`Number of Visits`)) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_all_country[1], end_date = input$date_all_country[2])
       } else if(input$traffic_select == 'ctr_ses'){
         data4dygraph <- all_country_data_dt() %>%
-          mutate(clicks=`Number of Sessions`*`Clickthrough Rate Per Session`) %>%
-          group_by(Date) %>%
-          summarize("Clickthrough Rate Per Session"=sum(clicks)/sum(`Number of Sessions`)) %>%
-          rename(date=Date) %>%
+          dplyr::mutate(clicks=`Number of Sessions`*`Clickthrough Rate Per Session`) %>%
+          dplyr::group_by(Date) %>%
+          dplyr::summarize("Clickthrough Rate Per Session"=sum(clicks)/sum(`Number of Sessions`)) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_all_country[1], end_date = input$date_all_country[2])
       } else{
         data4dygraph <- {
           if(input$prop_a) all_country_data_prop_dt() else all_country_data_dt()
         } %>%
-          select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
-          group_by(Date) %>%
-          summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_a,"`)")) %>%
-          rename(date=Date) %>%
+          dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
+          dplyr::group_by(Date) %>%
+          dplyr::summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_a,"`)")) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_all_country[1], end_date = input$date_all_country[2])
         names(data4dygraph)[2] <- paste0(isolate(cntr_reactive$selected_metric_a))
       }
@@ -626,16 +703,16 @@ shinyServer(function(input, output, session) {
         data4dygraph <- {
           if(input$prop_a) all_country_data_prop_dt() else all_country_data_dt()
         } %>%
-          select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
+          dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
           tidyr::spread_(., key_col="Country", value_col=cntr_reactive$selected_metric_a, fill=0) %>%
-          rename(date=Date) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_all_country[1], end_date = input$date_all_country[2])
       } else{
         data4dygraph <- {
           if(input$prop_a) all_country_data_prop_dt() else all_country_data_dt()
         } %>%
-          select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
-          rename(date=Date) %>%
+          dplyr::select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_a,"`"))) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_all_country[1], end_date = input$date_all_country[2])
         names(data4dygraph)[2] <- paste0(isolate(selected_country_a()))
       }
@@ -678,17 +755,17 @@ shinyServer(function(input, output, session) {
       this_metric <- "Number of Sessions"
     }
     data4pie <- all_country_data_dt() %>%
-      group_by(Region) %>%
-      mutate_(region_total=paste0("sum(`",this_metric,"`)")) %>%
-      group_by(Region, Country) %>%
-      mutate_(country_total=paste0("sum(`",this_metric,"`)")) %>%
-      select(Region, Country, country_total, region_total) %>%
-      unique() %>% ungroup() %>% arrange(Region, Country)
+      dplyr::group_by(Region) %>%
+      dplyr::mutate_(region_total=paste0("sum(`",this_metric,"`)")) %>%
+      dplyr::group_by(Region, Country) %>%
+      dplyr::mutate_(country_total=paste0("sum(`",this_metric,"`)")) %>%
+      dplyr::select(Region, Country, country_total, region_total) %>%
+      unique() %>% dplyr::ungroup() %>% dplyr::arrange(Region, Country)
     data4pie_us <- us_data %>%
-      filter(us_data$Date >= input$date_all_country[1]
+      dplyr::filter(us_data$Date >= input$date_all_country[1]
              & us_data$Date <= input$date_all_country[2]) %>%
-      group_by(Country) %>%
-      summarise_(us_total=paste0("sum(`",this_metric,"`)")) %>% ungroup()
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(us_total=paste0("sum(`",this_metric,"`)")) %>% dplyr::ungroup()
     hc <- highchart() %>%
       hc_chart(type = "pie", plotBackgroundColor=NULL, plotBorderWidth=NULL, plotShadow=F) %>%
       hc_title(text = paste0(this_metric, " by Country"),
@@ -706,8 +783,8 @@ shinyServer(function(input, output, session) {
           )
         )
       ) %>%
-      hc_add_series(data = data4pie %>% select(name=Region, y=region_total) %>%
-                      mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Region, y=region_total) %>%
+                      dplyr::mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
                     size = '60%',
                     name = "All Continents",
                     dataLabels = list(distance = -60,
@@ -716,13 +793,13 @@ shinyServer(function(input, output, session) {
                                                      return this.percentage > 5 ? this.point.name : null;
   }"))
                    ) %>%
-      hc_add_series(data = data4pie %>% select(name=Country, y=country_total) %>%
-                      mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Country, y=country_total) %>%
+                      dplyr::mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
                     name = "All Countries", size = '100%', innerSize = "60%") %>%
       hc_drilldown(
         allowPointDrilldown = TRUE,
-        series = data4pie %>% mutate(id=tolower(Region)) %>%
-          select(name=Country, y=country_total, id) %>%
+        series = data4pie %>% dplyr::mutate(id=tolower(Region)) %>%
+          dplyr::select(name=Country, y=country_total, id) %>%
           unique() %>%
           split(.$id) %>%
           lapply(function(x){
@@ -780,13 +857,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_f %in% c("us_f", "custom_f")){
       fnl_tbl <- first_visits_country %>%
         rbind(first_visits_us) %>%
-        filter(Date >= input$date_first_visit[1]
+        dplyr::filter(Date >= input$date_first_visit[1]
                & Date <= input$date_first_visit[2]
                & Country %in% selected_country_f()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- first_visits_country %>%
-        filter(Date >= input$date_first_visit[1]
+        dplyr::filter(Date >= input$date_first_visit[1]
                & Date <= input$date_first_visit[2]
                & Country %in% selected_country_f())
     }
@@ -796,13 +873,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_f %in% c("us_f", "custom_f")){
       fnl_tbl <- first_visits_country_prop %>%
         rbind(first_visits_us_prop) %>%
-        filter(Date >= input$date_first_visit[1]
+        dplyr::filter(Date >= input$date_first_visit[1]
                & Date <= input$date_first_visit[2]
                & Country %in% selected_country_f()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- first_visits_country_prop %>%
-        filter(Date >= input$date_first_visit[1]
+        dplyr::filter(Date >= input$date_first_visit[1]
                & Date <= input$date_first_visit[2]
                & Country %in% selected_country_f())
     }
@@ -820,12 +897,12 @@ shinyServer(function(input, output, session) {
   })
   selected_country_f <- reactive({
     all_country_temp<- first_visits_country %>%
-      filter(first_visits_country$Date >= input$date_first_visit[1]
+      dplyr::filter(first_visits_country$Date >= input$date_first_visit[1]
              & first_visits_country$Date <= input$date_first_visit[2]) %>%
-      select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
-      group_by(Country) %>%
-      summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
-      arrange(value, Country)
+      dplyr::select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
+      dplyr::arrange(value, Country)
     result <- switch(input$cntr_sort_f,
                      top10_f = {tail(all_country_temp, 10)$Country},
                      bottom50_f = {head(all_country_temp, 50)$Country},
@@ -850,10 +927,10 @@ shinyServer(function(input, output, session) {
       data4dygraph <- {
         if(input$prop_f) first_visits_country_prop_dt() else first_visits_country_dt()
       } %>%
-        select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
-        group_by(Date) %>%
-        summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
-        rename(date=Date) %>%
+        dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
+        dplyr::group_by(Date) %>%
+        dplyr::summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
+        dplyr::rename(date=Date) %>%
         fill_out(start_date = input$date_first_visit[1], end_date = input$date_first_visit[2])
       names(data4dygraph)[2] <- paste0(isolate(cntr_reactive$selected_metric_f))
     } else{
@@ -861,16 +938,16 @@ shinyServer(function(input, output, session) {
         data4dygraph <- {
           if(input$prop_f) first_visits_country_prop_dt() else first_visits_country_dt()
         } %>%
-          select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
+          dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
           tidyr::spread_(., key_col="Country", value_col=cntr_reactive$selected_metric_f, fill=0) %>%
-          rename(date=Date) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_first_visit[1], end_date = input$date_first_visit[2])
       } else{
         data4dygraph <- {
           if(input$prop_f) first_visits_country_prop_dt() else first_visits_country_dt()
         } %>%
-          select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
-          rename(date=Date) %>%
+          dplyr::select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_f,"`"))) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_first_visit[1], end_date = input$date_first_visit[2])
         names(data4dygraph)[2] <- paste0(isolate(selected_country_f()))
       }
@@ -898,17 +975,17 @@ shinyServer(function(input, output, session) {
   })
   output$first_visit_pie_pl <- renderHighchart({
     data4pie <- first_visits_country_dt() %>%
-      group_by(Region) %>%
-      mutate_(region_total=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
-      group_by(Region, Country) %>%
-      mutate_(country_total=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
-      select(Region, Country, country_total, region_total) %>%
-      unique() %>% ungroup() %>% arrange(Region, Country)
+      dplyr::group_by(Region) %>%
+      dplyr::mutate_(region_total=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
+      dplyr::group_by(Region, Country) %>%
+      dplyr::mutate_(country_total=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>%
+      dplyr::select(Region, Country, country_total, region_total) %>%
+      unique() %>% dplyr::ungroup() %>% dplyr::arrange(Region, Country)
     data4pie_us <- first_visits_us %>%
-      filter(first_visits_us$Date >= input$date_first_visit[1]
+      dplyr::filter(first_visits_us$Date >= input$date_first_visit[1]
              & first_visits_us$Date <= input$date_first_visit[2]) %>%
-      group_by(Country) %>%
-      summarise_(us_total=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>% ungroup()
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(us_total=paste0("sum(`",cntr_reactive$selected_metric_f,"`)")) %>% dplyr::ungroup()
     hc <- highchart() %>%
       hc_chart(type = "pie", plotBackgroundColor=NULL, plotBorderWidth=NULL, plotShadow=F) %>%
       hc_title(text = paste0("Number of ", cntr_reactive$selected_metric_f, " by Country"),
@@ -926,8 +1003,8 @@ shinyServer(function(input, output, session) {
             )
         )
       ) %>%
-      hc_add_series(data = data4pie %>% select(name=Region, y=region_total) %>%
-                      mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Region, y=region_total) %>%
+                      dplyr::mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
                     size = '60%',
                     name = "All Continents",
                     dataLabels = list(distance = -60,
@@ -936,13 +1013,13 @@ shinyServer(function(input, output, session) {
                                                      return this.percentage > 5 ? this.point.name : null;
   }"))
                    ) %>%
-      hc_add_series(data = data4pie %>% select(name=Country, y=country_total) %>%
-                      mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Country, y=country_total) %>%
+                      dplyr::mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
                     name = "All Countries", size = '100%', innerSize = "60%") %>%
       hc_drilldown(
         allowPointDrilldown = TRUE,
-        series = data4pie %>% mutate(id=tolower(Region)) %>%
-          select(name=Country, y=country_total, id) %>%
+        series = data4pie %>% dplyr::mutate(id=tolower(Region)) %>%
+          dplyr::select(name=Country, y=country_total, id) %>%
           unique() %>%
           split(.$id) %>%
           lapply(function(x){
@@ -983,13 +1060,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_l %in% c("us_l", "custom_l")){
       fnl_tbl <- last_action_country %>%
         rbind(last_action_us) %>%
-        filter(Date >= input$date_last_action[1]
+        dplyr::filter(Date >= input$date_last_action[1]
                & Date <= input$date_last_action[2]
                & Country %in% selected_country_l()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- last_action_country %>%
-        filter(Date >= input$date_last_action[1]
+        dplyr::filter(Date >= input$date_last_action[1]
                & Date <= input$date_last_action[2]
                & Country %in% selected_country_l())
     }
@@ -999,13 +1076,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_l %in% c("us_l", "custom_l")){
       fnl_tbl <- last_action_country_prop %>%
         rbind(last_action_us_prop) %>%
-        filter(Date >= input$date_last_action[1]
+        dplyr::filter(Date >= input$date_last_action[1]
                & Date <= input$date_last_action[2]
                & Country %in% selected_country_l()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- last_action_country_prop %>%
-        filter(Date >= input$date_last_action[1]
+        dplyr::filter(Date >= input$date_last_action[1]
                & Date <= input$date_last_action[2]
                & Country %in% selected_country_l())
     }
@@ -1023,12 +1100,12 @@ shinyServer(function(input, output, session) {
   })
   selected_country_l <- reactive({
     all_country_temp<- last_action_country %>%
-      filter(last_action_country$Date >= input$date_last_action[1]
+      dplyr::filter(last_action_country$Date >= input$date_last_action[1]
              & last_action_country$Date <= input$date_last_action[2]) %>%
-      select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
-      group_by(Country) %>%
-      summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
-      arrange(value, Country)
+      dplyr::select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
+      dplyr::arrange(value, Country)
     result <- switch(input$cntr_sort_l,
                      top10_l = {tail(all_country_temp, 10)$Country},
                      bottom50_l = {head(all_country_temp, 50)$Country},
@@ -1053,10 +1130,10 @@ shinyServer(function(input, output, session) {
       data4dygraph <- {
         if(input$prop_l) last_action_country_prop_dt() else last_action_country_dt()
       } %>%
-        select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
-        group_by(Date) %>%
-        summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
-        rename(date=Date) %>%
+        dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
+        dplyr::group_by(Date) %>%
+        dplyr::summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
+        dplyr::rename(date=Date) %>%
         fill_out(start_date = input$date_last_action[1], end_date = input$date_last_action[2])
       names(data4dygraph)[2] <- paste0(isolate(cntr_reactive$selected_metric_l))
     } else{
@@ -1064,16 +1141,16 @@ shinyServer(function(input, output, session) {
         data4dygraph <- {
           if(input$prop_l) last_action_country_prop_dt() else last_action_country_dt()
         } %>%
-          select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
+          dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
           tidyr::spread_(., key_col="Country", value_col=cntr_reactive$selected_metric_l, fill=0) %>%
-          rename(date=Date) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_last_action[1], end_date = input$date_last_action[2])
       } else{
         data4dygraph <- {
           if(input$prop_l) last_action_country_prop_dt() else last_action_country_dt()
         } %>%
-          select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
-          rename(date=Date) %>%
+          dplyr::select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_l,"`"))) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_last_action[1], end_date = input$date_last_action[2])
         names(data4dygraph)[2] <- paste0(isolate(selected_country_l()))
       }
@@ -1101,17 +1178,17 @@ shinyServer(function(input, output, session) {
   })
   output$last_action_pie_pl <- renderHighchart({
     data4pie <- last_action_country_dt() %>%
-      group_by(Region) %>%
-      mutate_(region_total=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
-      group_by(Region, Country) %>%
-      mutate_(country_total=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
-      select(Region, Country, country_total, region_total) %>%
-      unique() %>% ungroup() %>% arrange(Region, Country)
+      dplyr::group_by(Region) %>%
+      dplyr::mutate_(region_total=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
+      dplyr::group_by(Region, Country) %>%
+      dplyr::mutate_(country_total=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>%
+      dplyr::select(Region, Country, country_total, region_total) %>%
+      unique() %>% dplyr::ungroup() %>% dplyr::arrange(Region, Country)
     data4pie_us <- last_action_us %>%
-      filter(last_action_us$Date >= input$date_last_action[1]
+      dplyr::filter(last_action_us$Date >= input$date_last_action[1]
              & last_action_us$Date <= input$date_last_action[2]) %>%
-      group_by(Country) %>%
-      summarise_(us_total=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>% ungroup()
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(us_total=paste0("sum(`",cntr_reactive$selected_metric_l,"`)")) %>% dplyr::ungroup()
     hc <- highchart() %>%
       hc_chart(type = "pie", plotBackgroundColor=NULL, plotBorderWidth=NULL, plotShadow=F) %>%
       hc_title(text = paste0("Number of ", cntr_reactive$selected_metric_l, " by Country"),
@@ -1129,8 +1206,8 @@ shinyServer(function(input, output, session) {
           )
         )
       ) %>%
-      hc_add_series(data = data4pie %>% select(name=Region, y=region_total) %>%
-                      mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Region, y=region_total) %>%
+                      dplyr::mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
                     size = '60%',
                     name = "All Continents",
                     dataLabels = list(distance = -60,
@@ -1139,13 +1216,13 @@ shinyServer(function(input, output, session) {
                                                      return this.percentage > 5 ? this.point.name : null;
   }"))
                    ) %>%
-      hc_add_series(data = data4pie %>% select(name=Country, y=country_total) %>%
-                      mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Country, y=country_total) %>%
+                      dplyr::mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
                     name = "All Countries", size = '100%', innerSize = "60%") %>%
       hc_drilldown(
         allowPointDrilldown = TRUE,
-        series = data4pie %>% mutate(id=tolower(Region)) %>%
-          select(name=Country, y=country_total, id) %>%
+        series = data4pie %>% dplyr::mutate(id=tolower(Region)) %>%
+          dplyr::select(name=Country, y=country_total, id) %>%
           unique() %>%
           split(.$id) %>%
           lapply(function(x){
@@ -1186,13 +1263,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_m %in% c("us_m", "custom_m")){
       fnl_tbl <- most_common_country %>%
         rbind(most_common_us) %>%
-        filter(Date >= input$date_most_common[1]
+        dplyr::filter(Date >= input$date_most_common[1]
                & Date <= input$date_most_common[2]
                & Country %in% selected_country_m()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- most_common_country %>%
-        filter(Date >= input$date_most_common[1]
+        dplyr::filter(Date >= input$date_most_common[1]
                & Date <= input$date_most_common[2]
                & Country %in% selected_country_m())
     }
@@ -1202,13 +1279,13 @@ shinyServer(function(input, output, session) {
     if (input$cntr_sort_m %in% c("us_m", "custom_m")){
       fnl_tbl <- most_common_country_prop %>%
         rbind(most_common_us_prop) %>%
-        filter(Date >= input$date_most_common[1]
+        dplyr::filter(Date >= input$date_most_common[1]
                & Date <= input$date_most_common[2]
                & Country %in% selected_country_m()) %>%
-        arrange(Date, Country)
+        dplyr::arrange(Date, Country)
     } else{
       fnl_tbl <- most_common_country_prop %>%
-        filter(Date >= input$date_most_common[1]
+        dplyr::filter(Date >= input$date_most_common[1]
                & Date <= input$date_most_common[2]
                & Country %in% selected_country_m())
     }
@@ -1225,12 +1302,12 @@ shinyServer(function(input, output, session) {
   })
   selected_country_m <- reactive({
     all_country_temp<- most_common_country %>%
-      filter(most_common_country$Date >= input$date_most_common[1]
+      dplyr::filter(most_common_country$Date >= input$date_most_common[1]
              & most_common_country$Date <= input$date_most_common[2]) %>%
-      select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
-      group_by(Country) %>%
-      summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
-      arrange(value, Country)
+      dplyr::select_(.dots=c("Country",paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
+      dplyr::arrange(value, Country)
     result <- switch(input$cntr_sort_m,
                      top10_m = {tail(all_country_temp, 10)$Country},
                      bottom50_m = {head(all_country_temp, 50)$Country},
@@ -1255,10 +1332,10 @@ shinyServer(function(input, output, session) {
       data4dygraph <- {
         if(input$prop_m) most_common_country_prop_dt() else most_common_country_dt()
       } %>%
-        select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
-        group_by(Date) %>%
-        summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
-        rename(date=Date) %>%
+        dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
+        dplyr::group_by(Date) %>%
+        dplyr::summarize_(value=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
+        dplyr::rename(date=Date) %>%
         fill_out(start_date = input$date_most_common[1], end_date = input$date_most_common[2])
       names(data4dygraph)[2] <- paste0(isolate(cntr_reactive$selected_metric_m))
     } else{
@@ -1266,16 +1343,16 @@ shinyServer(function(input, output, session) {
         data4dygraph <- {
           if(input$prop_m) most_common_country_prop_dt() else most_common_country_dt()
         } %>%
-          select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
+          dplyr::select_(.dots=c("Date","Country",paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
           tidyr::spread_(., key_col="Country", value_col=cntr_reactive$selected_metric_m, fill=0) %>%
-          rename(date=Date) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_most_common[1], end_date = input$date_most_common[2])
       } else{
         data4dygraph <- {
           if(input$prop_m) most_common_country_prop_dt() else most_common_country_dt()
         } %>%
-          select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
-          rename(date=Date) %>%
+          dplyr::select_(.dots=c("Date", paste0("`",cntr_reactive$selected_metric_m,"`"))) %>%
+          dplyr::rename(date=Date) %>%
           fill_out(start_date = input$date_most_common[1], end_date = input$date_most_common[2])
         names(data4dygraph)[2] <- paste0(isolate(selected_country_m()))
       }
@@ -1303,17 +1380,17 @@ shinyServer(function(input, output, session) {
   })
   output$most_common_pie_pl <- renderHighchart({
     data4pie <- most_common_country_dt() %>%
-      group_by(Region) %>%
-      mutate_(region_total=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
-      group_by(Region, Country) %>%
-      mutate_(country_total=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
-      select(Region, Country, country_total, region_total) %>%
-      unique() %>% ungroup() %>% arrange(Region, Country)
+      dplyr::group_by(Region) %>%
+      dplyr::mutate_(region_total=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
+      dplyr::group_by(Region, Country) %>%
+      dplyr::mutate_(country_total=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>%
+      dplyr::select(Region, Country, country_total, region_total) %>%
+      unique() %>% dplyr::ungroup() %>% dplyr::arrange(Region, Country)
     data4pie_us <- most_common_us %>%
-      filter(most_common_us$Date >= input$date_most_common[1]
+      dplyr::filter(most_common_us$Date >= input$date_most_common[1]
              & most_common_us$Date <= input$date_most_common[2]) %>%
-      group_by(Country) %>%
-      summarise_(us_total=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>% ungroup()
+      dplyr::group_by(Country) %>%
+      dplyr::summarize_(us_total=paste0("sum(`",cntr_reactive$selected_metric_m,"`)")) %>% dplyr::ungroup()
     hc <- highchart() %>%
       hc_chart(type = "pie", plotBackgroundColor=NULL, plotBorderWidth=NULL, plotShadow=F) %>%
       hc_title(text = paste0("Number of ", cntr_reactive$selected_metric_m, " by Country"),
@@ -1331,8 +1408,8 @@ shinyServer(function(input, output, session) {
           )
         )
       ) %>%
-      hc_add_series(data = data4pie %>% select(name=Region, y=region_total) %>%
-                      mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Region, y=region_total) %>%
+                      dplyr::mutate(drilldown=tolower(name)) %>% unique() %>% list_parse(),
                     size = '60%',
                     name = "All Continents",
                     dataLabels = list(distance = -60,
@@ -1341,13 +1418,13 @@ shinyServer(function(input, output, session) {
                                                      return this.percentage > 5 ? this.point.name : null;
   }"))
                  ) %>%
-      hc_add_series(data = data4pie %>% select(name=Country, y=country_total) %>%
-                      mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
+      hc_add_series(data = data4pie %>% dplyr::select(name=Country, y=country_total) %>%
+                      dplyr::mutate(drilldown=ifelse(name=="United States","united states", NA)) %>% unique() %>% list_parse(),
                     name = "All Countries", size = '100%', innerSize = "60%") %>%
       hc_drilldown(
         allowPointDrilldown = TRUE,
-        series = data4pie %>% mutate(id=tolower(Region)) %>%
-          select(name=Country, y=country_total, id) %>%
+        series = data4pie %>% dplyr::mutate(id=tolower(Region)) %>%
+          dplyr::select(name=Country, y=country_total, id) %>%
           unique() %>%
           split(.$id) %>%
           lapply(function(x){
