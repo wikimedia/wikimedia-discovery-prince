@@ -49,7 +49,7 @@ read_country <- function(){
   country_data <<- tidyr::spread(
     dplyr::distinct(interim, date, country, .keep_all = TRUE),
     country, events, fill = NA
-  )
+  ) %>% as.data.frame()
   return(invisible())
 }
 
