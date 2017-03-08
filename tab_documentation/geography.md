@@ -7,7 +7,7 @@ Notes
 ------
 
 * Broadly-speaking, it's worth noting that (as with all data based on JavaScript logging) the code that gathers this information requires a certain amount of browser capabilities to function. It's probably not going to work on 10 year old Nokia brick phones, and so the data will be biased against users using those kinds of devices.
-* __A__: On 28 June 2016 our Event Logging system started recording a finer view of U.S. traffic, breaking it down into 5 regions:
+* '__A__': on 2016-06-28 our Event Logging system started recording a finer view of U.S. traffic, breaking it down into 5 regions:
     - **Northeast Region**
         - New England Division: Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island and Vermont
         - Middle Atlantic Division: New Jersey, New York and Pennsylvania
@@ -22,7 +22,8 @@ Notes
         - Mountain Division: Arizona, Colorado, Idaho, Montana, Nevada, New Mexico, Utah and Wyoming
     - **Pacific Region**
         - Alaska, California, Hawaii, Oregon and Washington
-* __B__ (13 September 2016): Added event logging of language-switching, causing some events to flow into old table and some events to flow into the new table. See [T143149](https://phabricator.wikimedia.org/T143149) for more details.
+* '__B__' (2016-09-13): Added event logging of language-switching, causing some events to flow into old table and some events to flow into the new table. See [T143149](https://phabricator.wikimedia.org/T143149) for more details.
+* '__R__': on 2017-01-01 we started calculating all of Discovery's metrics using a new version of [our data retrieval and processing codebase](https://phabricator.wikimedia.org/diffusion/WDGO/) that we migrated to [Wikimedia Analytics](https://www.mediawiki.org/wiki/Analytics)' [Reportupdater infrastructure](https://wikitech.wikimedia.org/wiki/Analytics/Reportupdater). See [T150915](https://phabricator.wikimedia.org/T150915) for more details.
 
 See [T136257](https://phabricator.wikimedia.org/T136257) for more details.
 

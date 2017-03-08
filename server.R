@@ -51,7 +51,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$action_breakdown_dygraph <- renderDygraph({
@@ -68,7 +69,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$most_common_dygraph <- renderDygraph({
@@ -83,7 +85,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "A (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "A (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$first_visit_dygraph <- renderDygraph({
@@ -99,7 +102,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "A (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "A (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$dwelltime_dygraph <- renderDygraph({
@@ -115,7 +119,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$sisproj_dygraph <- renderDygraph({
@@ -137,7 +142,8 @@ shinyServer(function(input, output, session) {
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_sisproj), rename = FALSE) %>%
       polloi::make_dygraph("Date", ifelse(input$sisproj_type == "prop", "Proportion (%)", input$sisproj_metric),
                            paste(ifelse(input$sisproj_metric == "Clicks", "Clicks", "Users who clicked"), "on links other Wikimedia Foundation projects")) %>%
-      dyLegend(labelsDiv = "sisproj_legend", show = "always", width = 600)
+      dyLegend(labelsDiv = "sisproj_legend", show = "always", width = 600) %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
     return(dy)
   })
 
@@ -187,7 +193,8 @@ shinyServer(function(input, output, session) {
       tidyr::spread(group, clicks, fill = 0) %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_applinks), rename = FALSE) %>%
       polloi::make_dygraph("Date", ifelse(input$applinks_type == "prop", "Proportion (%)", "Clicks"), "Clicks on Wikipedia mobile app links") %>%
-      dyLegend(labelsDiv = "applinks_legend", show = "always", width = 600)
+      dyLegend(labelsDiv = "applinks_legend", show = "always", width = 600) %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
     return(dy)
   })
 
@@ -222,7 +229,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-28"), "A (regional U.S.)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$browser_selector_container <- renderUI({
@@ -330,7 +338,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-03-10"), "Search Box Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$pageview_dygraph <- renderDygraph({
@@ -348,7 +357,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-06-09"), "B (unexplainable rise)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-22"), "C (pageview redefined)", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-07-11"), "D (split-pageviews)", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$referer_summary_dygraph <- renderDygraph({
@@ -362,7 +372,8 @@ shinyServer(function(input, output, session) {
       dyLegend(labelsDiv = "referer_summary_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-07"), "A (UDF switch)", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-05-01"), "B (search-redirect.php)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-05-01"), "B (search-redirect.php)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$search_engines_dygraph <- renderDygraph({
@@ -374,7 +385,8 @@ shinyServer(function(input, output, session) {
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
       dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
       dyLegend(labelsDiv = "search_engines_legend", show = "always") %>%
-      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE)
+      dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   output$s_dygraph <- renderDygraph({
@@ -434,7 +446,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   lv_reactive <- reactiveValues(choices = NULL, selected_langs = NULL)
@@ -585,7 +598,8 @@ shinyServer(function(input, output, session) {
       dyEvent(as.Date("2016-05-18"), "Sister Links Updated", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-06-02"), "Detect Language Deployed", labelLoc = "bottom", color = "white") %>%
       dyEvent(as.Date("2016-08-16"), "Secondary Links Collapsed", labelLoc = "bottom", color = "white") %>%
-      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "B (schema switch)", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
 
   # General Geo Breakdowns
@@ -744,7 +758,8 @@ shinyServer(function(input, output, session) {
       dyAxis("x", rangePad = 8) %>%
       dyLegend(width = 400, labelsDiv = "cntr_a_legend", show = "always", showZeroValues = FALSE) %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
   output$traffic_pie_pl <- renderHighchart({
     if(input$traffic_select %in% c('events','ctr_all')){
@@ -971,7 +986,8 @@ shinyServer(function(input, output, session) {
       dyAxis("x", rangePad = 8) %>%
       dyLegend(width = 400, labelsDiv = "cntr_f_legend", show = "always", showZeroValues = FALSE)  %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
   output$first_visit_pie_pl <- renderHighchart({
     data4pie <- first_visits_country_dt() %>%
@@ -1174,7 +1190,8 @@ shinyServer(function(input, output, session) {
       dyAxis("x", rangePad = 8) %>%
       dyLegend(width = 400, labelsDiv = "cntr_l_legend", show = "always", showZeroValues = FALSE)  %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
   output$last_action_pie_pl <- renderHighchart({
     data4pie <- last_action_country_dt() %>%
@@ -1376,7 +1393,8 @@ shinyServer(function(input, output, session) {
       dyAxis("x", rangePad = 8) %>%
       dyLegend(width = 400, labelsDiv = "cntr_m_legend", show = "always", showZeroValues = FALSE)  %>%
       dyCSS(css = "www/inverse.css") %>%
-      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white")
+      dyEvent(as.Date("2016-09-13"), "Schema Switch", labelLoc = "bottom", color = "white") %>%
+      dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
   })
   output$most_common_pie_pl <- renderHighchart({
     data4pie <- most_common_country_dt() %>%

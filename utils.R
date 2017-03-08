@@ -150,22 +150,22 @@ read_geo <- function() {
   first_visits_country <- polloi::read_dataset("discovery/portal/first_visits_country.tsv", col_types = "Dccid")
   last_action_country <- polloi::read_dataset("discovery/portal/last_action_country.tsv", col_types = "Dccid")
   most_common_country <- polloi::read_dataset("discovery/portal/most_common_country.tsv", col_types = "Dccid")
-  all_country_data$country[all_country_data$country=="Cape Verde"] <- "Cabo Verde"
-  first_visits_country$country[first_visits_country$country=="Cape Verde"] <- "Cabo Verde"
-  last_action_country$country[last_action_country$country=="Cape Verde"] <- "Cabo Verde"
-  most_common_country$country[most_common_country$country=="Cape Verde"] <- "Cabo Verde"
-  all_country_data$country[all_country_data$country=="Czechia"] <- "Czech Republic"
-  first_visits_country$country[first_visits_country$country=="Czechia"] <- "Czech Republic"
-  last_action_country$country[last_action_country$country=="Czechia"] <- "Czech Republic"
-  most_common_country$country[most_common_country$country=="Czechia"] <- "Czech Republic"
-  data("countrycode_data", package="countrycode")
-  countrycode_data$country.name[c(54,143)] <- c("Congo, The Democratic Republic of the", "Macedonia, Republic of" )
-  countrycode_data$continent[countrycode_data$country.name %in% c("British Indian Ocean Territory","Christmas Island","Taiwan, Province of China")] <- "Asia"
+  all_country_data$country[all_country_data$country == "Cape Verde"] <- "Cabo Verde"
+  first_visits_country$country[first_visits_country$country == "Cape Verde"] <- "Cabo Verde"
+  last_action_country$country[last_action_country$country == "Cape Verde"] <- "Cabo Verde"
+  most_common_country$country[most_common_country$country == "Cape Verde"] <- "Cabo Verde"
+  all_country_data$country[all_country_data$country == "Czechia"] <- "Czech Republic"
+  first_visits_country$country[first_visits_country$country == "Czechia"] <- "Czech Republic"
+  last_action_country$country[last_action_country$country == "Czechia"] <- "Czech Republic"
+  most_common_country$country[most_common_country$country == "Czechia"] <- "Czech Republic"
+  data("countrycode_data", package = "countrycode")
+  # Note: version 0.19 (published on CRAN on 2017-02-06) has renamed 'country.name' to 'country.name.en'
+  countrycode_data$country.name.en[c(54, 143)] <- c("Congo, The Democratic Republic of the", "Macedonia, Republic of" )
+  countrycode_data$continent[countrycode_data$country.name.en %in% c("British Indian Ocean Territory", "Christmas Island", "Taiwan, Province of China")] <- "Asia"
   countrycode_data$continent[countrycode_data$region == "South America"] <- "South America"
   countrycode_data$continent[countrycode_data$continent == "Americas"] <- "North America"
 
-
-  all_country_data <- all_country_data[!duplicated(all_country_data[,1:2],fromLast=T),]
+  all_country_data <- all_country_data[!duplicated(all_country_data[,1:2],fromLast = TRUE),]
   all_country_data_prop <- all_country_data %>%
     dplyr::group_by(date) %>%
     dplyr::mutate(event_prop=round(events/sum(events),4)*100, visit_prop=round(n_visit/sum(n_visit),4)*100, session_prop=round(n_session/sum(n_session),4)*100) %>%
@@ -202,10 +202,10 @@ read_geo <- function() {
   colnames(us_data_prop) <- c("Date", "Country", "Number of Events",
                               "Overall Clickthrough Rate", "Number of Visits", "Clickthrough Rate Per Visit",
                               "Number of Sessions", "Clickthrough Rate Per Session")
-  region_mask <- match(stringi::stri_trans_general(all_country_data$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(all_country_data$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   all_country_data$Region <- countrycode_data$continent[region_mask]
   all_country_data$Region[is.na(all_country_data$Region)] <- "Other"
-  region_mask <- match(stringi::stri_trans_general(all_country_data_prop$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(all_country_data_prop$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   all_country_data_prop$Region <- countrycode_data$continent[region_mask]
   all_country_data_prop$Region[is.na(all_country_data_prop$Region)] <- "Other"
   all_country_data <<- all_country_data[, c(1:2, 9, 3:8)] %>% dplyr::arrange(Date, Country)
@@ -214,7 +214,7 @@ read_geo <- function() {
   us_data_prop <<- us_data_prop %>% dplyr::mutate(Region="North America") %>% dplyr::select(c(1:2, 9, 3:8)) %>% dplyr::arrange(Date, Country)
 
 
-  first_visits_country <- first_visits_country[!duplicated(first_visits_country[,1:3],fromLast=T),]
+  first_visits_country <- first_visits_country[!duplicated(first_visits_country[,1:3],fromLast = TRUE),]
   colnames(first_visits_country) <- c("Date", "Action", "Country", "Number of Sessions", "Proportion")
   first_visits_country$Proportion <- first_visits_country$Proportion*100
   first_visits_country_prop <- tidyr::spread(first_visits_country[,-4], key=Action, value=Proportion, fill=0)
@@ -231,10 +231,10 @@ read_geo <- function() {
   first_visits_country_prop <- first_visits_us_prop %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
     dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(first_visits_country_prop[!us_mask,])
-  region_mask <- match(stringi::stri_trans_general(first_visits_country$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(first_visits_country$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   first_visits_country$Region <- countrycode_data$continent[region_mask]
   first_visits_country$Region[is.na(first_visits_country$Region)] <- "Other"
-  region_mask <- match(stringi::stri_trans_general(first_visits_country_prop$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(first_visits_country_prop$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   first_visits_country_prop$Region <- countrycode_data$continent[region_mask]
   first_visits_country_prop$Region[is.na(first_visits_country_prop$Region)] <- "Other"
   first_visits_country <<- first_visits_country[, c(1, 8:9, 2:7)] %>% dplyr::arrange(Date, Country)
@@ -243,7 +243,7 @@ read_geo <- function() {
   first_visits_us_prop <<- first_visits_us_prop %>% dplyr::mutate(Region="North America") %>% dplyr::select(c(1:2, 9, 3:8)) %>% dplyr::arrange(Date, Country)
 
 
-  last_action_country <- last_action_country[!duplicated(last_action_country[,1:3],fromLast=T),]
+  last_action_country <- last_action_country[!duplicated(last_action_country[,1:3],fromLast = TRUE),]
   colnames(last_action_country) <- c("Date", "Action", "Country", "Events", "Proportion")
   last_action_country$Proportion <- last_action_country$Proportion*100
   last_action_country_prop <- tidyr::spread(last_action_country[,-4], key=Action, value=Proportion, fill=0)
@@ -260,10 +260,10 @@ read_geo <- function() {
   last_action_country_prop <- last_action_us_prop %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
     dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(last_action_country_prop[!us_mask,])
-  region_mask <- match(stringi::stri_trans_general(last_action_country$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(last_action_country$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   last_action_country$Region <- countrycode_data$continent[region_mask]
   last_action_country$Region[is.na(last_action_country$Region)] <- "Other"
-  region_mask <- match(stringi::stri_trans_general(last_action_country_prop$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(last_action_country_prop$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   last_action_country_prop$Region <- countrycode_data$continent[region_mask]
   last_action_country_prop$Region[is.na(last_action_country_prop$Region)] <- "Other"
   last_action_country <<- last_action_country[, c(1, 8:9, 2:7)] %>% dplyr::arrange(Date, Country)
@@ -272,7 +272,7 @@ read_geo <- function() {
   last_action_us_prop <<- last_action_us_prop %>% dplyr::mutate(Region="North America") %>% dplyr::select(c(1:2, 9, 3:8)) %>% dplyr::arrange(Date, Country)
 
 
-  most_common_country <- most_common_country[!duplicated(most_common_country[,1:3],fromLast=T),]
+  most_common_country <- most_common_country[!duplicated(most_common_country[,1:3],fromLast = TRUE),]
   colnames(most_common_country) <- c("Date", "Action", "Country", "Number of Visits", "Proportion")
   most_common_country$Proportion <- most_common_country$Proportion*100
   most_common_country_prop <- tidyr::spread(most_common_country[,-4], key=Action, value=Proportion, fill=0)
@@ -289,10 +289,10 @@ read_geo <- function() {
   most_common_country_prop <- most_common_us_prop %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
     dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(most_common_country_prop[!us_mask,])
-  region_mask <- match(stringi::stri_trans_general(most_common_country$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(most_common_country$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   most_common_country$Region <- countrycode_data$continent[region_mask]
   most_common_country$Region[is.na(most_common_country$Region)] <- "Other"
-  region_mask <- match(stringi::stri_trans_general(most_common_country_prop$Country, "Latin-ASCII"), countrycode_data$country.name)
+  region_mask <- match(stringi::stri_trans_general(most_common_country_prop$Country, "Latin-ASCII"), countrycode_data$country.name.en)
   most_common_country_prop$Region <- countrycode_data$continent[region_mask]
   most_common_country_prop$Region[is.na(most_common_country_prop$Region)] <- "Other"
   most_common_country <<- most_common_country[, c(1, 7:8, 2:6)] %>% dplyr::arrange(Date, Country)
