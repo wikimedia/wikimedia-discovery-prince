@@ -514,7 +514,7 @@ shinyServer(function(input, output, session) {
     if (input$lv_sort %in% c("top10", "bottom50")) {
       hidden(disabled(selectizeInput("lv_languages", "Wikipedia languages", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE)))
     } else {
-      selectizeInput("lv_languages", "Wikipedia languages (12 max)", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12))
+      selectizeInput("lv_languages", "Wikipedia languages (12 max)", lv_reactive$choices, lv_reactive$selected_langs, multiple = TRUE, options = list(maxItems = 12, plugins = list("remove_button")))
     }
   })
 

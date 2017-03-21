@@ -44,8 +44,8 @@ function(request) {
                            menuSubItem(text = "Most Common Section", tabName = "most_common_by_country"),
                            icon = icon("globe", lib = "glyphicon")),
                   menuItem(text = "Global Settings",
-                           selectInput(inputId = "smoothing_global", label = "Smoothing", selectize = TRUE, selected = "day",
-                                       choices = c("No Smoothing" = "day", "Weekly Median" = "week", "Monthly Median" = "month", "Splines" = "gam")),
+                           selectizeInput(inputId = "smoothing_global", label = "Smoothing", selected = "day",
+                                          choices = c("No Smoothing" = "day", "Weekly Median" = "week", "Monthly Median" = "month", "Splines" = "gam")),
                            br(style = "line-height:25%;"), icon = icon("cog", lib = "glyphicon"))
       ),
       div(icon("info-sign", lib = "glyphicon"), HTML("<strong>Tip</strong>: you can drag on the graphs with your mouse to zoom in on a particular date range."), style = "padding: 10px; color: black;"),
@@ -270,7 +270,7 @@ function(request) {
                    conditionalPanel("(input.traffic_select=='events' || input.traffic_select=='visits' || input.traffic_select=='sessions') && !input.prop_a", checkboxInput("cntr_logscale_a", "Use Log scale", FALSE))),
             column(width = 5,
                    conditionalPanel("input.cntr_sort_a == 'custom_a'",
-                                    selectizeInput("cntr_a", "Countries", choices = sort(c(unique(all_country_data$country), "United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, width = "100%")))
+                                    selectizeInput("cntr_a", "Countries", choices = sort(c(unique(all_country_data$country), "United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, options = list(plugins = list("remove_button")), width = "100%")))
           ),
           fluidRow(
             highcharter::highchartOutput("traffic_pie_pl", height = "500px"),
@@ -320,7 +320,7 @@ function(request) {
                    conditionalPanel("!input.prop_f", checkboxInput("cntr_logscale_f", "Use Log scale", FALSE))),
             column(width = 5,
                    conditionalPanel("input.cntr_sort_f == 'custom_f'",
-                                    selectizeInput("cntr_f", "Countries", choices = sort(c(unique(all_country_data$country),"United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, width = "100%")))
+                                    selectizeInput("cntr_f", "Countries", choices = sort(c(unique(all_country_data$country),"United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, options = list(plugins = list("remove_button")), width = "100%")))
           ),
           fluidRow(
             highcharter::highchartOutput("first_visit_pie_pl", height = "500px"),
@@ -369,7 +369,7 @@ function(request) {
                    conditionalPanel("!input.prop_l", checkboxInput("cntr_logscale_l", "Use Log scale", FALSE))),
             column(width = 5,
                    conditionalPanel("input.cntr_sort_l == 'custom_l'",
-                                    selectizeInput("cntr_l", "Countries", choices = sort(c(unique(all_country_data$country), "United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, width = "100%")))
+                                    selectizeInput("cntr_l", "Countries", choices = sort(c(unique(all_country_data$country), "United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, options = list(plugins = list("remove_button")), width = "100%")))
           ),
           fluidRow(
             highcharter::highchartOutput("last_action_pie_pl", height = "500px"),
@@ -418,7 +418,7 @@ function(request) {
                    conditionalPanel("!input.prop_m", checkboxInput("cntr_logscale_m", "Use Log scale", FALSE))),
             column(width = 5,
                    conditionalPanel("input.cntr_sort_m == 'custom_m'",
-                                    selectizeInput("cntr_m", "Countries", choices = sort(c(unique(all_country_data$country), "United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, width = "100%")))
+                                    selectizeInput("cntr_m", "Countries", choices = sort(c(unique(all_country_data$country), "United States")), selected = c("United Kingdom", "Germany", "India", "Canada", "U.S. (South)"), multiple = TRUE, options = list(plugins = list("remove_button")), width = "100%")))
           ),
           fluidRow(
             highcharter::highchartOutput("most_common_pie_pl", height = "500px"),
