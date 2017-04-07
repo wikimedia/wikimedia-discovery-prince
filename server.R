@@ -201,7 +201,7 @@ shinyServer(function(input, output, session) {
   output$country_breakdown_dygraph <- renderDygraph({
     if (input$group_us_regions) {
       temp <- country_data
-      temp$`United States` <- rowSums(temp[, grepl("(United States)|(U\\.S\\. )", colnames(temp)), drop = FALSE])
+      temp$`United States` <- rowSums(temp[, grepl("(United States)|(U\\.S\\. )", colnames(temp)), drop = FALSE], na.rm = TRUE)
       temp <- temp[, grep("U.S.", colnames(temp), value = TRUE, invert = TRUE, fixed = TRUE)]
     } else {
       temp <- country_data
@@ -362,13 +362,13 @@ shinyServer(function(input, output, session) {
   })
 
   output$referer_summary_dygraph <- renderDygraph({
-    summary_traffic_data %>%
+    dplyr::select(summary_traffic_data, -Total) %>%
       polloi::smoother(smooth_level = polloi::smooth_switch(input$smoothing_global, input$smoothing_referer_summary)) %>%
       polloi::make_dygraph(xlab = "Date", ylab = "% of Pageviews",
                            title = "Traffic to Wikipedia Portal brown down by origin") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
+      dyAxis("y", valueFormatter = 'function(x) { return Math.round(x * 100)/100 + "%"; }') %>%
       dyLegend(labelsDiv = "referer_summary_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2016-03-07"), "A (UDF switch)", labelLoc = "bottom", color = "white") %>%
@@ -383,7 +383,7 @@ shinyServer(function(input, output, session) {
                            title = "Traffic to Wikipedia Portal broken down by search engine") %>%
       dyCSS(css = "www/inverse.css") %>%
       dyAxis("x", axisLabelFormatter = polloi::custom_axis_formatter, axisLabelWidth = 70) %>%
-      dyAxis("y", valueFormatter = 'function(x) { return x + "%"; }') %>%
+      dyAxis("y", valueFormatter = 'function(x) { return Math.round(x * 100)/100 + "%"; }') %>%
       dyLegend(labelsDiv = "search_engines_legend", show = "always") %>%
       dyRangeSelector(fillColor = "", strokeColor = "", retainDateWindow = TRUE) %>%
       dyEvent(as.Date("2017-01-01"), "R (reportupdater)", labelLoc = "bottom", color = "white")
