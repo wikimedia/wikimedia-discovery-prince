@@ -6,22 +6,22 @@ source("extras.R")
 read_clickthrough <- function(){
   # Read in and format the high-level data
   clickthrough_rate <<- data.table::as.data.table(
-    polloi::read_dataset("discovery/portal/clickthrough_rate.tsv", col_types = "Dci")
+    polloi::read_dataset("discovery/metrics/portal/clickthrough_rate.tsv", col_types = "Dci")
   )[, j = list(`clickthrough rate` = 100 * (events[type == "clickthrough"]/sum(events))), by = "date"]
   # Read in and format the breakdown data
   interim <- data.table::as.data.table(
-    polloi::read_dataset("discovery/portal/clickthrough_breakdown.tsv", col_types = "Dci")
+    polloi::read_dataset("discovery/metrics/portal/clickthrough_breakdown.tsv", col_types = "Dci")
   )[, j = list(section_used = section_used, proportion = 100 * (events/sum(events))), by = "date"]
   action_breakdown <<- tidyr::spread(dplyr::distinct(interim, date, section_used, .keep_all = TRUE),
                                      section_used, proportion, fill = 0)
   # Read in most common section per visit data
   interim <- data.table::as.data.table(
-    polloi::read_dataset("discovery/portal/most_common_per_visit.tsv", col_types = "Dci")
+    polloi::read_dataset("discovery/metrics/portal/most_common_per_visit.tsv", col_types = "Dci")
   )[, j = list(section_used = section_used, proportion = 100 * (visits/sum(visits))), by = "date"]
   most_common <<- tidyr::spread(dplyr::distinct(interim, date, section_used, .keep_all = TRUE),
                                 section_used, proportion, fill = 0)
   # Read in first visit clickthrough rates
-  interim <- polloi::read_dataset("discovery/portal/clickthrough_firstvisit.tsv", col_types = "Ddddddd")
+  interim <- polloi::read_dataset("discovery/metrics/portal/clickthrough_firstvisit.tsv", col_types = "Ddddddd")
   interim[, -1] <- 100 * interim[, -1] # first column is always going to be the date
   interim$`language search` <- 0
   first_visit_ctrs <<- interim[, names(action_breakdown)]
@@ -29,7 +29,7 @@ read_clickthrough <- function(){
 }
 
 read_langs <- function() {
-  interim <- polloi::read_dataset("discovery/portal/language_destination.tsv", col_types = "Dciiiii")
+  interim <- polloi::read_dataset("discovery/metrics/portal/language_destination.tsv", col_types = "Dciiiii")
   suppressMessages({
     prefixes <- polloi::get_prefixes()[, -2]
   })
@@ -38,13 +38,13 @@ read_langs <- function() {
 }
 
 read_dwelltime <- function(){
-  dwelltime_data <<- data.table::as.data.table(polloi::read_dataset("discovery/portal/dwell_metrics.tsv", col_types = "Dddd"))
+  dwelltime_data <<- data.table::as.data.table(polloi::read_dataset("discovery/metrics/portal/dwell_metrics.tsv", col_types = "Dddd"))
   return(invisible())
 }
 
 read_country <- function(){
   interim <- data.table::as.data.table(
-    polloi::read_dataset("discovery/portal/country_data.tsv", col_types = "Dci")
+    polloi::read_dataset("discovery/metrics/portal/country_data.tsv", col_types = "Dci")
   )[, list(country = country, events = 100 * (events/sum(events))), by = "date"]
   country_data <<- tidyr::spread(
     dplyr::distinct(interim, date, country, .keep_all = TRUE),
@@ -54,7 +54,7 @@ read_country <- function(){
 }
 
 read_useragents <- function(){
-  interim <- polloi::read_dataset("discovery/portal/user_agent_data.tsv", col_types = "Dccd")
+  interim <- polloi::read_dataset("discovery/metrics/portal/user_agent_data.tsv", col_types = "Dccd")
   interim$browser[interim$browser == "Chrome Mobile"] <- "Chrome Mobile (Android)"
   interim$browser[interim$browser == "Chrome Mobile iOS"] <- "Chrome Mobile (iOS)"
   interim$browser[interim$browser == "Mobile Safari"] <- "Safari Mobile"
@@ -94,7 +94,7 @@ read_useragents <- function(){
 
 read_pageviews <- function(){
   pageview_data <<- dplyr::distinct(polloi::read_dataset(
-    "discovery/portal/pageviews.tsv", col_types = "Diii-", skip = 1,
+    "discovery/metrics/portal/pageviews.tsv", col_types = "Diii-", skip = 1,
     col_names = c("date", "total pageviews", "high-volume clients' PVs", "low-volume clients' PVs")
   ), date, .keep_all = TRUE)
   return(invisible())
@@ -102,7 +102,7 @@ read_pageviews <- function(){
 
 read_referrals <- function(){
   # Read in the initial data
-  interim <- polloi::read_dataset("discovery/portal/referer_data.tsv", col_types = "Dlcci")
+  interim <- polloi::read_dataset("discovery/metrics/portal/referer_data.tsv", col_types = "Dlcci")
   interim$search_engine[interim$search_engine == "none"] <- "Not referred by search"
   # Write out the overall values for traffic
   summary_traffic_data <<- interim %>%
@@ -136,12 +136,12 @@ read_referrals <- function(){
 }
 
 read_sisproj <- function() {
-  sisproj_clicks <<- polloi::read_dataset("discovery/portal/clickthrough_sisterprojects.tsv", col_types = "Dcii") %>%
+  sisproj_clicks <<- polloi::read_dataset("discovery/metrics/portal/clickthrough_sisterprojects.tsv", col_types = "Dcii") %>%
     dplyr::filter(!grepl("(Privacy_policy|Terms_of_Use|.com|servlet)", destination), !grepl("^http", destination))
 }
 
 read_applinks <- function() {
-  applink_clicks <<- polloi::read_dataset("discovery/portal/app_link_clicks.tsv", col_types = "Dcci")
+  applink_clicks <<- polloi::read_dataset("discovery/metrics/portal/app_link_clicks.tsv", col_types = "Dcci")
 }
 
 find_region <- function(country_names, countrycode_data) {
@@ -158,10 +158,10 @@ find_region <- function(country_names, countrycode_data) {
 
 read_geo <- function() {
 
-  all_country_data <- polloi::read_dataset("discovery/portal/all_country_data.tsv", col_types = "Dcididid")
-  first_visits_country <- polloi::read_dataset("discovery/portal/first_visits_country.tsv", col_types = "Dccid")
-  last_action_country <- polloi::read_dataset("discovery/portal/last_action_country.tsv", col_types = "Dccid")
-  most_common_country <- polloi::read_dataset("discovery/portal/most_common_country.tsv", col_types = "Dccid")
+  all_country_data <- polloi::read_dataset("discovery/metrics/portal/all_country_data.tsv", col_types = "Dcididid")
+  first_visits_country <- polloi::read_dataset("discovery/metrics/portal/first_visits_country.tsv", col_types = "Dccid")
+  last_action_country <- polloi::read_dataset("discovery/metrics/portal/last_action_country.tsv", col_types = "Dccid")
+  most_common_country <- polloi::read_dataset("discovery/metrics/portal/most_common_country.tsv", col_types = "Dccid")
   data("countrycode_data", package = "countrycode")
   # Note: version 0.19 (published on CRAN on 2017-02-06) has renamed 'country.name' to 'country.name.en'
   countrycode_data$continent[countrycode_data$country.name.en %in% c("British Indian Ocean Territory", "Christmas Island", "Taiwan, Province of China")] <- "Asia"
