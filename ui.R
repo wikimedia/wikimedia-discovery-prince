@@ -1,7 +1,7 @@
 library(shiny)
 library(shinydashboard)
 
-all_country_data <- polloi::read_dataset("discovery/portal/all_country_data.tsv", col_types = "Dcididid")
+all_country_data <- polloi::read_dataset("discovery/metrics/portal/all_country_data.tsv", col_types = "Dcididid")
 
 function(request) {
   dashboardPage(
