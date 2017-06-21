@@ -22,13 +22,12 @@ Until 27 June 2016, traffic to Wikipedias was almost evenly split between people
 
 ## Questions, bug reports, and feature suggestions
 
-For technical, non-bug questions, [email Mikhail](mailto:mpopov@wikimedia.org?subject=Dashboard%20Question). If you experience a bug or notice something wrong or have a suggestion, [open a ticket in Phabricator](https://phabricator.wikimedia.org/maniphest/task/create/?projects=Discovery) in the Discovery board or [email Deb](mailto:deb@wikimedia.org?subject=Dashboard%20Question).
+For technical, non-bug questions, [email Mikhail](mailto:mpopov@wikimedia.org?subject=Dashboard%20Question) or [Chelsy](mailto:cxie@wikimedia.org?subject=Dashboard%20Question). If you experience a bug or notice something wrong or have a suggestion, [open a ticket in Phabricator](https://phabricator.wikimedia.org/maniphest/task/create/?projects=Discovery) in the Discovery board or [email Deb](mailto:deb@wikimedia.org?subject=Dashboard%20Question).
 
 <hr style="border-color: gray;">
-<p style="font-size: small; color: gray;">
-  An experimental dashboard for looking at patterns of <a href= "https://www.mediawiki.org/wiki/Wikipedia.org_Portal">Wikipedia.org Portal</a> usage pertaining to users' languages. See <a href="https://phabricator.wikimedia.org/T140816">T140816</a> for more information.
-  <strong>Link to this dashboard:</strong>
-  <a href="http://discovery.wmflabs.org/portal/#languages_summary">
-    http://discovery.wmflabs.org/portal/#languages_summary
-  </a>
+<p style="font-size: small;">
+  <strong>Link to this dashboard:</strong> <a href="https://discovery.wmflabs.org/portal/#languages_summary">https://discovery.wmflabs.org/portal/#languages_summary</a>
+  | Page is available under <a href="https://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-ShareAlike License">CC-BY-SA 3.0</a>
+  | <a href="https://phabricator.wikimedia.org/diffusion/WDPR/" title="Wikipedia.org Portal Dashboard source code repository">Code</a> is licensed under <a href="https://phabricator.wikimedia.org/diffusion/WDPR/browse/master/LICENSE.md" title="MIT License">MIT</a>
+  | Part of <a href="https://discovery.wmflabs.org/">Discovery Dashboards</a>
 </p>
