@@ -225,12 +225,12 @@ read_geo <- function() {
   us_mask <- grepl("^U\\.S\\.", first_visits_country$Country)
   first_visits_us <- first_visits_country[us_mask, ]
   first_visits_country <- first_visits_us %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
-    dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
+    dplyr::summarize_all(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(first_visits_country[!us_mask,])
   us_mask <- grepl("^U\\.S\\.", first_visits_country_prop$Country)
   first_visits_us_prop <- first_visits_country_prop[us_mask, ]
   first_visits_country_prop <- first_visits_us_prop %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
-    dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
+    dplyr::summarize_all(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(first_visits_country_prop[!us_mask,])
   first_visits_country$Region <- find_region(first_visits_country$Country, countrycode_data)
   first_visits_country$Region[is.na(first_visits_country$Region)] <- "Other"
@@ -252,12 +252,12 @@ read_geo <- function() {
   us_mask <- grepl("^U\\.S\\.", last_action_country$Country)
   last_action_us <- last_action_country[us_mask, ]
   last_action_country <- last_action_us %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
-    dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
+    dplyr::summarize_all(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(last_action_country[!us_mask,])
   us_mask <- grepl("^U\\.S\\.", last_action_country_prop$Country)
   last_action_us_prop <- last_action_country_prop[us_mask, ]
   last_action_country_prop <- last_action_us_prop %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
-    dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
+    dplyr::summarize_all(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(last_action_country_prop[!us_mask,])
   last_action_country$Region <- find_region(last_action_country$Country, countrycode_data)
   last_action_country$Region[is.na(last_action_country$Region)] <- "Other"
@@ -279,12 +279,12 @@ read_geo <- function() {
   us_mask <- grepl("^U\\.S\\.", most_common_country$Country)
   most_common_us <- most_common_country[us_mask, ]
   most_common_country <- most_common_us %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
-    dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
+    dplyr::summarize_all(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(most_common_country[!us_mask,])
   us_mask <- grepl("^U\\.S\\.", most_common_country_prop$Country)
   most_common_us_prop <- most_common_country_prop[us_mask, ]
   most_common_country_prop <- most_common_us_prop %>% dplyr::select(-Country) %>% dplyr::group_by(Date) %>%
-    dplyr::summarize_each(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
+    dplyr::summarize_all(dplyr::funs(sum)) %>% dplyr::mutate(Country="United States") %>%
     rbind(most_common_country_prop[!us_mask,])
   most_common_country$Region <- find_region(most_common_country$Country, countrycode_data)
   most_common_country$Region[is.na(most_common_country$Region)] <- "Other"

@@ -27,7 +27,7 @@ function(request) {
                   menuItem("Traffic",
                            menuSubItem(text = "Geographic breakdown", tabName = "country_breakdown"),
                            menuSubItem(text = "Browser breakdown", tabName = "browser_breakdown"),
-                           menuSubItem(text = "Pageviews", tabName = "pageview_tab"),
+                           menuSubItem(text = "Pageviews", tabName = "pageviews"),
                            icon = icon("line-chart")),
                   menuItem("Languages",
                            menuSubItem(text = "Summary", tabName = "languages_summary"),
@@ -160,7 +160,7 @@ function(request) {
                            width = 9)),
                 includeMarkdown("./tab_documentation/browsers.md")
         ),
-        tabItem(tabName = "pageview_tab",
+        tabItem(tabName = "pageviews",
                 fluidRow(
                   column(polloi::smooth_select("smoothing_pageviews"), width = 3),
                   column(HTML("<label style = \"margin-bottom: -10px;\">Scale</label>"),
@@ -433,5 +433,5 @@ function(request) {
       )
     ),
 
-    skin = "black", title = "Portal Traffic Dashboard | Discovery | Engineering | Wikimedia Foundation")
+    skin = "black", title = "Portal Traffic Dashboard | Discovery | Audiences | Wikimedia Foundation")
 }
