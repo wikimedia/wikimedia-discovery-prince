@@ -1,7 +1,7 @@
 Pageviews (PVs) to Wikipedia.org Portal
 =======
 
-This looks at, without sampling, the number of pageviews the Wikipedia Portal gets per day. This is expressed as raw values. See [our Hive query](https://github.com/wikimedia/wikimedia-discovery-golden/blob/master/portal/pageviews.R#L9) for the technical definition of a Wikipedia.org pageview.
+This looks at, without sampling, the number of pageviews the Wikipedia Portal gets per day. This is expressed as raw values. See [our Hive query](https://phabricator.wikimedia.org/diffusion/WDGO/browse/master/modules/metrics/portal/pageviews.R) for the technical definition of a Wikipedia.org pageview.
 
 Notes
 ------
